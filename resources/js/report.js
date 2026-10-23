@@ -2,9 +2,12 @@ const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (character
 const number = (value, digits = 1) => Number(value).toLocaleString('en-GB', { maximumFractionDigits: digits });
 const rate = (value) => value === null ? 'Unavailable' : `${number(value)}%`;
 
-export function reportHtml(data, jobs, search = '') {
+export function reportHtml(data, jobs, search = '', exportedAt = new Date()) {
     const station = data.station === 'all' ? 'All stations' : `Station ${data.station.slice(2)}`;
-    const title = `DET-production-${data.date}-${data.station}`;
+    const dateParts = new Intl.DateTimeFormat('en', { timeZone: 'Asia/Kuala_Lumpur', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(exportedAt);
+    const datePart = (type) => dateParts.find((part) => part.type === type).value;
+    const exportDate = `${datePart('year')}-${datePart('month')}-${datePart('day')}`;
+    const title = `shimadzu ${station} ${exportDate}`;
     const summary = data.summary;
     const metrics = [
         ['Efficiency', rate(summary.efficiency)],
@@ -64,7 +67,12 @@ export function printReport(html) {
     frame.setAttribute('aria-hidden', 'true');
     frame.style.cssText = 'position:fixed;left:-10000px;top:0;width:1px;height:1px;border:0;';
     frame.addEventListener('load', () => {
-        frame.contentWindow.addEventListener('afterprint', () => frame.remove(), { once: true });
+        const originalTitle = document.title;
+        document.title = frame.contentDocument.title;
+        frame.contentWindow.addEventListener('afterprint', () => {
+            document.title = originalTitle;
+            frame.remove();
+        }, { once: true });
         frame.contentWindow.focus();
         frame.contentWindow.print();
     }, { once: true });

@@ -8,7 +8,7 @@ A Laravel application for reviewing DET production activity from an imported wor
 - Date and station filters with comparisons to the previous recorded date.
 - Logged cycles, recorded quantities, running time, idle time, efficiency, availability, and performance.
 - Station activity timelines and searchable, paginated job records with detail dialogs.
-- CSV export of jobs matching the current filters and search.
+- Print-ready PDF reports with daily metrics and jobs matching the current filters and search. Choose Save as PDF in the browser print dialog.
 - Source coverage and import metadata.
 
 The dashboard reads a historical JSON snapshot. It does not connect to a live production feed or import Excel or Power BI files automatically.

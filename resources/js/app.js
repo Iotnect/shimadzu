@@ -1,3 +1,5 @@
+import { printReport, reportHtml } from './report';
+
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
 const icon = (name, extra = '') => `<svg class="icon ${extra}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#icon-${name}"/></svg>`;
@@ -183,19 +185,8 @@ function showSource() {
 function exportReport() {
     const jobs = matchingJobs();
     if (!jobs.length) return notify('There are no matching job records to export.');
-    const safeCell = (value) => {
-        let content = String(value ?? '');
-        if (/^[=+@\-\t\r]/.test(content)) content = `'${content}`;
-        return `"${content.replace(/"/g, '""')}"`;
-    };
-    const rows = [['Job ID', 'Station', 'Product', 'Operator', 'Instruction reference', 'Start', 'End', 'Cycle minutes', 'Recorded quantity'], ...jobs.map((job) => [job.id, job.station, job.product, job.worker, job.reference, job.start, job.end, duration(job.start, job.end).toFixed(2), job.quantity])];
-    const url = URL.createObjectURL(new Blob(['\uFEFF', rows.map((row) => row.map(safeCell).join(',')).join('\r\n')], { type: 'text/csv;charset=utf-8;' }));
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `DET-production-${state.data.date}-${state.data.station}.csv`;
-    link.click();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-    notify(`${jobs.length} job records exported${state.search ? ' matching your search' : ''}.`);
+    printReport(reportHtml(state.data, jobs, state.search));
+    notify('Choose Save as PDF in the print dialog to save your report.');
 }
 
 $('#date-filter').addEventListener('change', (event) => {

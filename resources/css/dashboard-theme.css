@@ -7,6 +7,8 @@
 .logout-button { display: flex; align-items: center; gap: 6px; color: #787878; background: #f1f1f1; border: 1px solid #e5e5e5; border-radius: 7px; padding: 6px 9px; font-size: 10px; }
 .logout-button .icon { width: 12px; height: 12px; }
 .logout-button:hover { background: #e6e6e6; color: #525252; }
+.sidebar-logout { margin: 0 4px 18px; }
+.sidebar-logout .logout-button { width: 100%; justify-content: space-between; padding: 11px 13px; font-size: 12px; }
 :root {
     --canvas: #f1f1f1;
     --ink: #373737;

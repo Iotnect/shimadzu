@@ -47,12 +47,16 @@
                 <div class="source-card"><span class="source-card-icon"><x-icon name="database" /></span><strong>Your data, connected.</strong><p>One workspace for a clearer picture of production.</p><button class="source-link" data-dialog="source">View data source <span>↗</span></button></div>
                 <button class="nav-link" data-dialog="method"><x-icon name="help" />Help & metric guide</button>
                 <div class="profile"><div class="avatar">AD</div><div><strong>{{ auth()->user()->name }}</strong><small>Shimadzu · DET workspace</small></div><span class="profile-dot"></span></div>
+                <form method="POST" action="{{ route('logout') }}" class="sidebar-logout">
+                    @csrf
+                    <button type="submit" class="logout-button">Sign out <x-icon name="arrow" /></button>
+                </form>
             </div>
         </aside>
         <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
         <div class="main-shell">
-            <header class="topbar"><div class="breadcrumb"><button class="icon-button mobile-menu" aria-label="Open navigation" aria-expanded="false" id="menu-toggle"><x-icon name="menu" /></button><span>Workspace</span><x-icon name="arrow" /><strong>Production overview</strong></div><div class="topbar-right"><span class="snapshot-badge"><i></i> Excel snapshot</span><span class="topbar-divider"></span><button class="icon-button" aria-label="Open metric guide" data-dialog="method"><x-icon name="help" /></button><div class="avatar small" title="{{ auth()->user()->name }}">AD</div><form method="POST" action="{{ route('logout') }}">@csrf<button type="submit" class="logout-button">Sign out <x-icon name="arrow" /></button></form></div></header>
+            <header class="topbar"><div class="breadcrumb"><button class="icon-button mobile-menu" aria-label="Open navigation" aria-expanded="false" id="menu-toggle"><x-icon name="menu" /></button><span>Workspace</span><x-icon name="arrow" /><strong>Production overview</strong></div><div class="topbar-right"><span class="snapshot-badge"><i></i> Excel snapshot</span><span class="topbar-divider"></span><button class="icon-button" aria-label="Open metric guide" data-dialog="method"><x-icon name="help" /></button><div class="avatar small" title="{{ auth()->user()->name }}">AD</div></div></header>
             <main id="main">
                 <section id="overview" class="page-heading"><div><div class="eyebrow"><span class="eyebrow-line"></span> PRODUCTION WORKSPACE</div><h1>Production overview<span class="title-dot">.</span></h1><p>Every station. Every cycle. One clear view.</p></div><button class="button button-primary" id="export-report"><x-icon name="download" />Export report</button></section>
 

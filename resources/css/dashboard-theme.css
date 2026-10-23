@@ -436,3 +436,79 @@ tbody tr:hover { background: #f4f4f4; }
 .logout-button:hover { color: #b21620; background: #fbe3e6; }
 .toast { background: #333; }
 button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible { outline-color: #dc7a81; }
+
+.management-label { margin-top: 26px; }
+.settings-panel { max-width: 900px; }
+.setting-row { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 25px; border-top: 1px solid var(--line); }
+.setting-row h3 { font-size: 15px; font-weight: 600; color: var(--ink); }
+.setting-row p { max-width: 530px; margin-top: 8px; font-size: 12px; line-height: 1.7; color: #777; }
+.setting-control { display: flex; align-items: center; gap: 12px; flex-shrink: 0; font-size: 12px; color: #777; }
+.theme-switch { display: flex; align-items: center; width: 48px; height: 28px; padding: 3px; border: 1px solid #c7cbd1; border-radius: 999px; background: #d4d8dd; cursor: pointer; }
+.theme-switch-thumb { display: block; width: 20px; height: 20px; border-radius: 50%; background: #fff; box-shadow: 0 1px 4px #0003; transition: transform .18s ease; }
+.theme-switch[aria-checked="true"] { background: #d91b25; border-color: #d91b25; }
+.theme-switch[aria-checked="true"] .theme-switch-thumb { transform: translateX(20px); }
+
+html[data-theme="dark"] {
+    color-scheme: dark;
+    --canvas: #14171c;
+    --ink: #edf0f4;
+    --muted: #a8b0bd;
+    --line: #343b46;
+    --teal-light: #36232b;
+    --soft-raised: 0 8px 24px #0003;
+    --soft-inset: inset 1px 1px 4px #0003;
+}
+[data-theme="dark"] body { background: var(--canvas); color: var(--ink); }
+[data-theme="dark"] .sidebar, [data-theme="dark"] .topbar { background: #1b2027; border-color: var(--line); scrollbar-color: #49515d #1b2027; }
+[data-theme="dark"] .company-logo-plate { padding: 7px; }
+[data-theme="dark"] .workspace, [data-theme="dark"] .filter-bar, [data-theme="dark"] .timeline-stats,
+[data-theme="dark"] .date-field, [data-theme="dark"] .station-select, [data-theme="dark"] .search-field,
+[data-theme="dark"] .snapshot-badge, [data-theme="dark"] .subtle-badge, [data-theme="dark"] .station-pill,
+[data-theme="dark"] .nav-count, [data-theme="dark"] .station-number { background: #282e38; border-color: #3c4552; box-shadow: none; color: #c3cbd7; }
+[data-theme="dark"] .panel, [data-theme="dark"] .kpi-card, [data-theme="dark"] .kpi-card:first-child,
+[data-theme="dark"] .detail-dialog { background: #20262f; border-color: #343b46; box-shadow: 0 8px 24px #0002; }
+[data-theme="dark"] .kpi-card:first-child { border-top-color: #ef4650; }
+[data-theme="dark"] .profile, [data-theme="dark"] .dialog-header, [data-theme="dark"] td { border-color: #343b46; }
+[data-theme="dark"] h1, [data-theme="dark"] h2, [data-theme="dark"] .breadcrumb strong,
+[data-theme="dark"] .workspace strong, [data-theme="dark"] .profile strong, [data-theme="dark"] .kpi-number,
+[data-theme="dark"] .station-name, [data-theme="dark"] .job-ref, [data-theme="dark"] .product-name,
+[data-theme="dark"] .distribution-key-item strong, [data-theme="dark"] .donut-center strong,
+[data-theme="dark"] .station-label-text strong, [data-theme="dark"] .timeline-stat strong,
+[data-theme="dark"] .detail-grid strong, [data-theme="dark"] .metric-guide h3 { color: #edf0f4; }
+[data-theme="dark"] .nav-link, [data-theme="dark"] .kpi-label, [data-theme="dark"] .kpi-card:first-child .kpi-label,
+[data-theme="dark"] .kpi-context, [data-theme="dark"] .kpi-card:first-child .kpi-context,
+[data-theme="dark"] .panel-heading p, [data-theme="dark"] .page-heading p, [data-theme="dark"] .setting-row p,
+[data-theme="dark"] .setting-control, [data-theme="dark"] td, [data-theme="dark"] .legend,
+[data-theme="dark"] .date-field input, [data-theme="dark"] .station-select select, [data-theme="dark"] .search-field input,
+[data-theme="dark"] .distribution-key-item, [data-theme="dark"] .worker-name,
+[data-theme="dark"] .dialog-copy, [data-theme="dark"] .metric-guide p,
+[data-theme="dark"] .efficiency-cell span { color: #bcc5d2; }
+[data-theme="dark"] .nav-link.active, [data-theme="dark"] .nav-link:hover,
+[data-theme="dark"] .logout-button, [data-theme="dark"] .icon-button:hover { background: #3a242e; color: #ff9aa1; border-color: #68404b; box-shadow: none; }
+[data-theme="dark"] .logout-button:hover { background: #4b2934; }
+[data-theme="dark"] .kpi-card:first-child .kpi-number, [data-theme="dark"] .text-button,
+[data-theme="dark"] .station-foot .text-button { color: #ff8992; }
+[data-theme="dark"] .kpi-icon, [data-theme="dark"] .kpi-card:first-child .kpi-icon,
+[data-theme="dark"] .workspace-icon, [data-theme="dark"] .panel-symbol, [data-theme="dark"] .filter-icon,
+[data-theme="dark"] .avatar, [data-theme="dark"] .profile .avatar { background: #362b35; color: #ff9aa1; border-color: #59404b; box-shadow: none; }
+[data-theme="dark"] th, [data-theme="dark"] .pagination, [data-theme="dark"] .station-foot,
+[data-theme="dark"] .distribution-foot, [data-theme="dark"] .dialog-note { background: #252c36; color: #bac4d1; border-color: #343b46; }
+[data-theme="dark"] tbody tr:hover { background: #2a323e; }
+[data-theme="dark"] .button-quiet { background: #303946; color: #d9e0ea; border-color: #465162; box-shadow: none; }
+[data-theme="dark"] .donut, [data-theme="dark"] .donut::before { border-color: #343b46; box-shadow: none; }
+[data-theme="dark"] .donut::before { background: #20262f; }
+[data-theme="dark"] .interval { border-color: #20262f; }
+[data-theme="dark"] .efficiency-track, [data-theme="dark"] .kpi-mini-track,
+[data-theme="dark"] .kpi-card:first-child .kpi-mini-track { background: #39424e; box-shadow: none; }
+[data-theme="dark"] .delta { background: #263e50; color: #a6cbe5; border-color: #3b576e; }
+[data-theme="dark"] .delta.negative, [data-theme="dark"] .kpi-card:first-child .delta.negative { background: #412b35; color: #ffadb5; border-color: #64404c; }
+[data-theme="dark"] .delta.neutral { background: #303846; color: #c0c9d5; border-color: #465162; }
+[data-theme="dark"] .topbar-right .small { box-shadow: none; border-color: #59404b; }
+[data-theme="dark"] .detail-dialog::backdrop { background: #0009; }
+@media (max-width: 700px) {
+    .setting-row { align-items: flex-start; padding: 20px 17px; gap: 16px; }
+    .setting-control { flex-direction: column-reverse; gap: 7px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .theme-switch-thumb { transition: none; }
+}

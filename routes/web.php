@@ -10,6 +10,7 @@ Route::middleware('guest')->group(function (): void {
 });
 
 Route::middleware('auth')->group(function (): void {
+    Route::view('/setting', 'settings')->name('settings');
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard/data', [DashboardController::class, 'data'])->name('dashboard.data');
     Route::post('/logout', [SessionController::class, 'destroy'])->name('logout');

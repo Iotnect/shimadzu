@@ -1,5 +1,3 @@
-import '../css/dashboard-theme.css';
-
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
 const icon = (name, extra = '') => `<svg class="icon ${extra}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#icon-${name}"/></svg>`;
@@ -70,7 +68,7 @@ function renderTimeline() {
             const label = `${segment.station} · ${segment.status} · ${timeLabel(segment.start)}–${timeLabel(segment.end)} · ${number(segment.minutes, 1)} min`;
             return `<button class="interval ${segment.status.toLowerCase()}" style="left:${position(minuteOffset(segment.start))}%;width:${Math.max(.12, duration(segment.start, segment.end) / span * 100)}%" title="${label}" aria-label="${label}" data-segment="${index}"></button>`;
         }).join('');
-        return `<div class="timeline-row"><div class="station-label"><span class="station-number">${escape(row.station.slice(2))}</span><div class="station-label-text"><strong>Station ${escape(row.station.slice(2))}</strong><small>${row.cycles} logged cycles</small></div></div><div class="track" style="background-image:linear-gradient(to right,#ededed 1px,transparent 1px);background-size:${100 / hourCount}% 100%">${breakBands}${intervals || '<span class="timeline-empty">No recorded activity</span>'}</div></div>`;
+        return `<div class="timeline-row"><div class="station-label"><span class="station-number">${escape(row.station.slice(2))}</span><div class="station-label-text"><strong>Station ${escape(row.station.slice(2))}</strong><small>${row.cycles} logged cycles</small></div></div><div class="track" style="background-image:linear-gradient(to right,var(--line) 1px,transparent 1px);background-size:${100 / hourCount}% 100%">${breakBands}${intervals || '<span class="timeline-empty">No recorded activity</span>'}</div></div>`;
     }).join('')}<div class="break-labels">${breaks.map(([start, end, label]) => `<span class="break-label" style="left:${position((start + end) / 2)}%">${label}</span>`).join('')}</div>`;
 }
 
@@ -243,22 +241,5 @@ document.addEventListener('click', (event) => {
     const stationButton = event.target.closest('[data-station]');
     if (stationButton) { loadData(state.data.date, stationButton.dataset.station); $('#timeline').scrollIntoView({ behavior: 'smooth' }); }
 });
-
-function closeSidebar() {
-    $('#sidebar').classList.remove('open');
-    $('#menu-toggle').setAttribute('aria-expanded', 'false');
-}
-$('#menu-toggle').addEventListener('click', () => {
-    const open = $('#sidebar').classList.toggle('open');
-    $('#menu-toggle').setAttribute('aria-expanded', String(open));
-});
-$('#sidebar-overlay').addEventListener('click', closeSidebar);
-document.addEventListener('keydown', (event) => { if (event.key === 'Escape') closeSidebar(); });
-$$('[data-nav]').forEach((link) => link.addEventListener('click', () => {
-    $$('[data-nav]').forEach((item) => { item.classList.remove('active'); item.removeAttribute('aria-current'); });
-    link.classList.add('active');
-    link.setAttribute('aria-current', 'location');
-    closeSidebar();
-}));
 
 render();

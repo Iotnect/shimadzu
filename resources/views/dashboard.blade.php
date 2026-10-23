@@ -44,8 +44,6 @@
                 <a href="#worklog" class="nav-link" data-nav="worklog"><x-icon name="list" />Work log</a>
             </nav>
             <div class="sidebar-bottom">
-                <div class="source-card"><span class="source-card-icon"><x-icon name="database" /></span><strong>Your data, connected.</strong><p>One workspace for a clearer picture of production.</p><button class="source-link" data-dialog="source">View data source <span>↗</span></button></div>
-                <button class="nav-link" data-dialog="method"><x-icon name="help" />Help & metric guide</button>
                 <div class="profile"><div class="avatar">AD</div><div><strong>{{ auth()->user()->name }}</strong><small>Shimadzu · DET workspace</small></div><span class="profile-dot"></span></div>
                 <form method="POST" action="{{ route('logout') }}" class="sidebar-logout">
                     @csrf

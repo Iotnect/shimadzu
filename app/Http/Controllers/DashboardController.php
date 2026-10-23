@@ -24,4 +24,21 @@ class DashboardController extends Controller
 
         return response()->json($dashboard->overview($input['date'], $input['station'] ?? 'all'));
     }
+
+    public function station(ProductionDashboard $dashboard, string $station): View
+    {
+        return view('dashboard', [
+            'dashboard' => $dashboard->overview(station: $station),
+            'stationPage' => $station,
+        ]);
+    }
+
+    public function stationData(Request $request, ProductionDashboard $dashboard, string $station): JsonResponse
+    {
+        $input = $request->validate([
+            'date' => ['required', 'date_format:Y-m-d'],
+        ]);
+
+        return response()->json($dashboard->overview($input['date'], $station));
+    }
 }

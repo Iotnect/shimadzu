@@ -53,6 +53,12 @@ class AuthenticationTest extends TestCase
         $this->getJson('/dashboard/data?date=2026-05-26')->assertUnauthorized();
     }
 
+    public function test_station_pages_and_data_are_not_available_to_guests(): void
+    {
+        $this->get('/stations/St1')->assertRedirect(route('login'));
+        $this->getJson('/stations/St1/data?date=2026-05-26')->assertUnauthorized();
+    }
+
     public function test_authenticated_users_are_redirected_away_from_login(): void
     {
         $user = User::factory()->create();

@@ -13,5 +13,11 @@ Route::middleware('auth')->group(function (): void {
     Route::view('/setting', 'settings')->name('settings');
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard/data', [DashboardController::class, 'data'])->name('dashboard.data');
+    Route::get('/stations/{station}', [DashboardController::class, 'station'])
+        ->whereIn('station', ['St1', 'St2', 'St3', 'St4'])
+        ->name('stations.show');
+    Route::get('/stations/{station}/data', [DashboardController::class, 'stationData'])
+        ->whereIn('station', ['St1', 'St2', 'St3', 'St4'])
+        ->name('stations.data');
     Route::post('/logout', [SessionController::class, 'destroy'])->name('logout');
 });

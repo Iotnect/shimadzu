@@ -31,6 +31,64 @@ class DashboardTest extends TestCase
             ->assertJsonPath('summary.performance', 49);
     }
 
+    public function test_station_page_displays_only_the_selected_station(): void
+    {
+        $this->useJobs($this->jobs());
+
+        $response = $this->get('/stations/St1')
+            ->assertOk()
+            ->assertViewIs('dashboard')
+            ->assertViewHas('stationPage', 'St1')
+            ->assertSee('Station 1')
+            ->assertSee('Open metric guide')
+            ->assertSee('View all stations');
+
+        $this->assertSame('St1', $response['dashboard']['station']);
+        $this->assertSame(2, $response['dashboard']['summary']['cycles']);
+        $this->assertSame(435, $response['dashboard']['summary']['available']);
+        $this->assertSame(['St1'], array_unique(array_column($response['dashboard']['jobs'], 'station')));
+    }
+
+    public function test_station_data_stays_scoped_when_another_station_is_requested(): void
+    {
+        $this->useJobs($this->jobs());
+
+        $this->getJson('/stations/St2/data?date=2026-05-26&station=all')
+            ->assertOk()
+            ->assertJsonPath('station', 'St2')
+            ->assertJsonCount(1, 'jobs')
+            ->assertJsonPath('jobs.0.station', 'St2')
+            ->assertJsonPath('summary.available', 435);
+    }
+
+    public function test_station_data_rejects_invalid_dates(): void
+    {
+        $this->actingAs(User::factory()->make());
+
+        $this->getJson('/stations/St1/data?date=not-a-date')
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('date');
+    }
+
+    public function test_unknown_station_pages_and_data_return_404(): void
+    {
+        $this->actingAs(User::factory()->make());
+
+        $this->get('/stations/St99')->assertNotFound();
+        $this->getJson('/stations/St99/data?date=2026-05-26')->assertNotFound();
+    }
+
+    public function test_station_without_jobs_has_an_empty_daily_view(): void
+    {
+        $this->useJobs($this->jobs());
+
+        $this->getJson('/stations/St4/data?date=2026-05-26')
+            ->assertOk()
+            ->assertJsonCount(0, 'jobs')
+            ->assertJsonPath('summary.cycles', 0)
+            ->assertJsonPath('summary.efficiency', null);
+    }
+
     public function test_station_filter_changes_jobs_capacity_and_expected_time_together(): void
     {
         $this->useJobs($this->jobs());

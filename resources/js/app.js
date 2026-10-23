@@ -217,9 +217,9 @@ $('#next-day').addEventListener('click', () => {
 $('#reset-filters').addEventListener('click', () => {
     state.search = '';
     $('#job-search').value = '';
-    loadData(state.data.source.to, 'all');
+    loadData(state.data.source.to, window.detStationPage ?? 'all');
 });
-$('#compare-stations').addEventListener('click', () => loadData(state.data.date, 'all'));
+$('#compare-stations')?.addEventListener('click', () => loadData(state.data.date, 'all'));
 $('#job-search').addEventListener('input', (event) => { state.search = event.target.value.trim().toLowerCase(); state.page = 1; renderJobs(); });
 $('#jobs-prev').addEventListener('click', () => { state.page--; renderJobs(); });
 $('#jobs-next').addEventListener('click', () => { state.page++; renderJobs(); });

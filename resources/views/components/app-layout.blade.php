@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#e31b23">
     <meta name="description" content="DET production cycle times, station activity, and daily performance in one clear workspace.">
-    <title>Shimadzu · Production overview</title>
+    <title>Shimadzu · {{ $title }}</title>
     <script>try { document.documentElement.dataset.theme = localStorage.getItem('shimadzu-theme') === 'dark' ? 'dark' : 'light'; } catch { document.documentElement.dataset.theme = 'light'; }</script>
     @vite(['resources/css/app.css', 'resources/js/shell.js'])
 </head>
@@ -41,10 +41,10 @@
             <div class="workspace"><span class="workspace-icon"><x-icon name="box" /></span><div><strong>DET Production</strong><small>Manufacturing workspace</small></div><x-icon name="arrow" /></div>
             <div class="nav-label">WORKSPACE</div>
             <nav class="primary-nav" aria-label="Main navigation">
-                <a href="{{ route('dashboard') }}#overview" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" data-nav="overview"><x-icon name="grid" />Overview @if(request()->routeIs('dashboard'))<span class="nav-active-dot"></span>@endif</a>
-                <a href="{{ route('dashboard') }}#timeline" class="nav-link" data-nav="timeline"><x-icon name="clock" />Cycle timeline</a>
-                <a href="{{ route('dashboard') }}#stations" class="nav-link" data-nav="stations"><x-icon name="chart" />Station analysis<span class="nav-count">4</span></a>
-                <a href="{{ route('dashboard') }}#worklog" class="nav-link" data-nav="worklog"><x-icon name="list" />Work log</a>
+                <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" @if(request()->routeIs('dashboard')) aria-current="page" @endif><x-icon name="grid" />Overview @if(request()->routeIs('dashboard'))<span class="nav-active-dot"></span>@endif</a>
+                @foreach(['St1', 'St2', 'St3', 'St4'] as $station)
+                    <a href="{{ route('stations.show', $station) }}" class="nav-link {{ request()->routeIs('stations.show') && request()->route('station') === $station ? 'active' : '' }}" @if(request()->routeIs('stations.show') && request()->route('station') === $station) aria-current="page" @endif><x-icon name="chart" />Station {{ substr($station, 2) }}</a>
+                @endforeach
             </nav>
             <div class="nav-label management-label">MANAGEMENT</div>
             <nav class="primary-nav" aria-label="Management navigation">
@@ -61,7 +61,7 @@
         <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
         <div class="main-shell">
-            <header class="topbar"><div class="breadcrumb"><button class="icon-button mobile-menu" aria-label="Open navigation" aria-expanded="false" id="menu-toggle"><x-icon name="menu" /></button><span>{{ request()->routeIs('settings') ? 'Management' : 'Workspace' }}</span><x-icon name="arrow" /><strong>{{ $title }}</strong></div><div class="topbar-right">@if(request()->routeIs('dashboard'))<button class="icon-button" aria-label="Open metric guide" data-dialog="method"><x-icon name="help" /></button>@endif</div></header>
+            <header class="topbar"><div class="breadcrumb"><button class="icon-button mobile-menu" aria-label="Open navigation" aria-expanded="false" id="menu-toggle"><x-icon name="menu" /></button><span>{{ request()->routeIs('settings') ? 'Management' : 'Workspace' }}</span><x-icon name="arrow" /><strong>{{ $title }}</strong></div><div class="topbar-right">@if(request()->routeIs('dashboard', 'stations.show'))<button class="icon-button" aria-label="Open metric guide" data-dialog="method"><x-icon name="help" /></button>@endif</div></header>
             <main id="main">{{ $slot }}</main>
         </div>
     </div>

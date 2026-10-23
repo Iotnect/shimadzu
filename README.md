@@ -1,58 +1,116 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Shimadzu Production Dashboard
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A Laravel application for reviewing DET production activity from an imported work log. The dashboard brings daily production metrics, station timelines, and individual job records into one workspace.
 
-## About Laravel
+## Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- Username and password sign-in, remember-me sessions, and login rate limiting.
+- Date and station filters with comparisons to the previous recorded date.
+- Logged cycles, recorded quantities, running time, idle time, efficiency, availability, and performance.
+- Station activity timelines and searchable, paginated job records with detail dialogs.
+- CSV export of jobs matching the current filters and search.
+- Source coverage and import metadata.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+The dashboard reads a historical JSON snapshot. It does not connect to a live production feed or import Excel or Power BI files automatically.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Requirements
 
-## Learning Laravel
+- PHP 8.3 or later, with the extensions required by Composer and PDO SQLite for the default database.
+- Composer 2.
+- Node.js 20.19+ within the 20.x release line, or 22.12+; npm.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+The project uses Laravel 13, Blade, Vite 8, and Tailwind CSS 4. Dependency versions are pinned in `composer.lock` and `package-lock.json`.
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Local setup
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+Clone the repository and install dependencies:
 
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
-
-```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+```sh
+git clone https://github.com/Iotnect/shimadzu.git
+cd shimadzu
+composer install
+npm ci
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Create the environment file and SQLite database, then initialize the application:
 
-## Contributing
+```sh
+php -r "file_exists('.env') || copy('.env.example', '.env');"
+php -r "file_exists('database/database.sqlite') || touch('database/database.sqlite');"
+php artisan key:generate --no-interaction
+php artisan migrate --no-interaction
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+The example environment uses SQLite with database-backed sessions and cache. To use another database, configure the `DB_*` values in `.env` before running migrations.
 
-## Code of Conduct
+### Production data
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Before opening the dashboard, supply `storage/app/private/det-worklog.json`. Private storage contents, the local database, and `.env` are excluded from Git, so a fresh clone does not include production data or user accounts.
 
-## Security Vulnerabilities
+The snapshot must contain `source`, `importedAt`, and a nonempty `jobs` array. Each job should include the fields shown below. This synthetic example can be saved at that path for a local preview:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```json
+{
+  "source": "example-worklog.xlsx",
+  "importedAt": "2026-10-23T09:00:00+08:00",
+  "jobs": [
+    {
+      "id": 1,
+      "station": "St1",
+      "product": "Example product",
+      "worker": "Example operator",
+      "reference": "DEMO-001",
+      "start": "2026-10-22T09:00:00",
+      "end": "2026-10-22T09:30:00",
+      "quantity": 2
+    }
+  ]
+}
+```
 
-## License
+Use station identifiers `St1` through `St5` and timestamps in the source's local time. Use a numeric quantity, or `null` when it was not recorded; zero quantities remain zero. Replace the snapshot with a new prepared JSON file to update the data. No import command is currently included.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### Login account
+
+Create an account with a password of at least eight characters:
+
+```sh
+php artisan app:create-admin admin
+```
+
+Enter the password at the secure prompt. Usernames accept letters, numbers, dots, underscores, and hyphens, up to 80 characters, and are stored in lowercase. Running the command again for the same username updates that account and its password.
+
+### Start the application
+
+Build the frontend and start the local server:
+
+```sh
+npm run build
+php artisan serve
+```
+
+Open the address printed by Artisan and sign in with the account you created. During frontend development, run `npm run dev` in a separate terminal to enable Vite updates.
+
+## Metric definitions
+
+| Metric | Calculation |
+| --- | --- |
+| Logged cycles | Number of job records for the selected date and station(s). |
+| Recorded quantity | Sum of source quantities; missing quantities are counted separately. |
+| Running time | Job duration in minutes, merging overlaps within each station. |
+| Idle time | Gaps between consecutive jobs at the same station, on the same date, shorter than 12 hours. |
+| Available time | 435 minutes per selected station. |
+| Efficiency | Running time / available time, as a percentage. |
+| Availability | Running time / (running time + idle time), as a percentage. |
+| Performance | Expected cycle time / running time, as a percentage. |
+
+Expected cycle time is the number of logged cycles multiplied by the station standard: St1 = 25.515, St2 = 37.24, St3 = 23.695, and St4 = 14.8925 minutes. St5 has no configured standard; performance is unavailable when selected jobs include a station without a standard. Standards are defined in `app/Services/ProductionDashboard.php` and attributed in the UI to `DET cycle timeline.pbix`.
+
+## Checks
+
+```sh
+php artisan test --compact
+npm run build
+```
+
+Tests cover authentication, dashboard filtering, metric calculations, overlapping jobs, missing values, and invalid filter inputs. Dashboard tests supply their own snapshot fixtures.

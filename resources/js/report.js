@@ -7,7 +7,7 @@ export function reportHtml(data, jobs, search = '', exportedAt = new Date()) {
     const dateParts = new Intl.DateTimeFormat('en', { timeZone: 'Asia/Kuala_Lumpur', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(exportedAt);
     const datePart = (type) => dateParts.find((part) => part.type === type).value;
     const exportDate = `${datePart('year')}-${datePart('month')}-${datePart('day')}`;
-    const title = `shimadzu ${station} ${exportDate}`;
+    const title = `Shimadzu ${station} ${exportDate}`;
     const summary = data.summary;
     const metrics = [
         ['Efficiency', rate(summary.efficiency)],

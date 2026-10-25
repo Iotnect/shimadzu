@@ -6,6 +6,8 @@
     <meta name="theme-color" content="#e31b23">
     <meta name="description" content="Sign in to the Shimadzu DET production workspace.">
     <title>Sign in · Shimadzu Production</title>
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}?v=shimadzu">
+    <link rel="icon" type="image/x-icon" sizes="16x16 32x32 48x48" href="{{ asset('favicon.ico') }}?v=shimadzu">
     @vite(['resources/css/app.css', 'resources/js/login.js'])
 </head>
 <body class="auth-page">

@@ -1,4 +1,8 @@
 import { printReport, reportHtml } from './report';
+import { mountDashboardControls } from './components/dashboard-controls';
+import { renderProductionMetrics } from './components/production-metrics';
+
+mountDashboardControls(window.detDashboard);
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
@@ -20,22 +24,7 @@ function notify(message) {
 }
 
 function renderMetrics() {
-    const { summary, previous } = state.data;
-    const metrics = [
-        { key: 'efficiency', label: 'Efficiency', icon: 'pulse', context: 'Running time / available time' },
-        { key: 'availability', label: 'Availability', icon: 'clock', context: 'Running time / recorded time' },
-        { key: 'performance', label: 'Performance', icon: 'trend', context: 'Expected time / running time' },
-        { key: 'cycles', label: 'Logged cycles', icon: 'box', context: `${number(summary.quantity)} units recorded in source${summary.missingQuantity ? ' · incomplete qty' : ''}` },
-    ];
-    $('#kpi-grid').innerHTML = metrics.map((metric) => {
-        const value = summary[metric.key];
-        const isCycles = metric.key === 'cycles';
-        const canCompare = value !== null && previous && previous[metric.key] !== null;
-        const difference = canCompare ? value - previous[metric.key] : null;
-        const deltaClass = difference > 0 ? '' : difference < 0 ? 'negative' : 'neutral';
-        const deltaText = difference === null ? 'No comparison' : `${difference > 0 ? '↗' : difference < 0 ? '↘' : '–'} ${number(Math.abs(difference), isCycles ? 0 : 1)}${isCycles ? '' : ' pp'}`;
-        return `<article class="kpi-card"><div class="kpi-top"><h2 class="kpi-label">${metric.label}</h2><span class="kpi-icon">${icon(metric.icon)}</span></div><div class="kpi-number">${value === null ? '—' : number(value, isCycles ? 0 : 1)}<small>${isCycles ? 'cycles' : '%'}</small></div><p class="kpi-context">${value === null ? (summary.cycles ? 'Standard time not configured' : 'No activity on this date') : metric.context}</p><div class="kpi-bottom"><span class="delta ${deltaClass}">${deltaText}</span><span>${canCompare ? `vs ${dayLabel(previous.date, { year: undefined })}` : 'Choose a day with activity'}</span></div><div class="kpi-mini-track" aria-hidden="true"><span style="width:${Math.min(100, Math.max(0, isCycles ? summary.cycles / Math.max(summary.cycles, previous?.cycles ?? 0, 1) * 100 : value ?? 0))}%"></span></div></article>`;
-    }).join('');
+    renderProductionMetrics(state.data);
 }
 
 function renderTimeline() {

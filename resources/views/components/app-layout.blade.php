@@ -7,7 +7,10 @@
     <meta name="theme-color" content="#e31b23">
     <meta name="description" content="DET production cycle times, station activity, and daily performance in one clear workspace.">
     <title>Shimadzu · {{ $title }}</title>
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}?v=shimadzu">
+    <link rel="icon" type="image/x-icon" sizes="16x16 32x32 48x48" href="{{ asset('favicon.ico') }}?v=shimadzu">
     <script>try { document.documentElement.dataset.theme = localStorage.getItem('shimadzu-theme') === 'dark' ? 'dark' : 'light'; } catch { document.documentElement.dataset.theme = 'light'; }</script>
+    @viteReactRefresh
     @vite(['resources/css/app.css', 'resources/js/shell.js'])
 </head>
 <body>
@@ -38,7 +41,6 @@
     <div class="app-shell">
         <aside class="sidebar" id="sidebar">
             <a class="brand company-brand" href="{{ route('dashboard') }}"><span class="company-logo-plate"><img src="{{ asset('images/shimadzu-logo.png') }}" alt="SHIMADZU" width="500" height="144"></span><small>PRODUCTION INTELLIGENCE</small></a>
-            <div class="workspace"><span class="workspace-icon"><x-icon name="box" /></span><div><strong>DET Production</strong><small>Manufacturing workspace</small></div><x-icon name="arrow" /></div>
             <div class="nav-label">WORKSPACE</div>
             <nav class="primary-nav" aria-label="Main navigation">
                 <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" @if(request()->routeIs('dashboard')) aria-current="page" @endif><x-icon name="grid" />Overview @if(request()->routeIs('dashboard'))<span class="nav-active-dot"></span>@endif</a>

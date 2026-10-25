@@ -1,25 +1,11 @@
 import '../css/dashboard-theme.css';
 
-const toggle = document.querySelector('#dark-mode-toggle');
-const status = document.querySelector('#theme-status');
+import { mountAppearanceSettings } from './components/appearance-settings';
 
-function updateToggle() {
-    const dark = document.documentElement.dataset.theme === 'dark';
-    if (toggle) toggle.setAttribute('aria-checked', String(dark));
-    if (status) status.textContent = dark ? 'On' : 'Off';
-}
-
-updateToggle();
-toggle?.addEventListener('click', () => {
-    const theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
-    document.documentElement.dataset.theme = theme;
-    try { localStorage.setItem('shimadzu-theme', theme); } catch { /* Keep the theme usable when storage is unavailable. */ }
-    updateToggle();
-});
+mountAppearanceSettings();
 window.addEventListener('storage', (event) => {
     if (event.key === 'shimadzu-theme' || event.key === null) {
-        document.documentElement.dataset.theme = event.newValue === 'dark' ? 'dark' : 'light';
-        updateToggle();
+        document.documentElement.dataset.theme = event.key !== null && event.newValue === 'dark' ? 'dark' : 'light';
     }
 });
 

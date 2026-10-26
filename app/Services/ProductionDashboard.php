@@ -41,6 +41,11 @@ class ProductionDashboard
         }
 
         $path = config('production.worklog_path');
+
+        if ((! is_string($path) || ! is_file($path)) && config('production.demo_mode')) {
+            $path = config('production.demo_worklog_path');
+        }
+
         abort_unless(is_string($path) && is_file($path) && is_readable($path), 503, 'Production data is temporarily unavailable.');
 
         return $this->decodeSnapshot(file_get_contents($path));
@@ -91,6 +96,7 @@ class ProductionDashboard
             'previous' => $previousDate === null ? null : ['date' => $previousDate, ...$this->summarize($previousJobs, $selectedStations)],
             'jobs' => $jobs,
             'source' => [
+                'isDemo' => (bool) ($snapshot['demo'] ?? false),
                 'name' => $snapshot['source'], 'importedAt' => $snapshot['importedAt'],
                 'records' => count($snapshot['jobs']), 'from' => $dates[0], 'to' => end($dates),
                 'standardSource' => 'DET cycle timeline.pbix',

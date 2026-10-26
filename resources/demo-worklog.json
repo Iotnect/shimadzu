@@ -1,0 +1,487 @@
+{
+    "source": "Synthetic demo work log",
+    "importedAt": "2026-05-27T09:00:00+08:00",
+    "demo": true,
+    "jobs": [
+        {
+            "id": 1,
+            "station": "St1",
+            "product": "UV detector assembly",
+            "worker": "Demo operator 1",
+            "reference": "DEMO-0001",
+            "start": "2026-05-25T08:33:00",
+            "end": "2026-05-25T08:54:00",
+            "quantity": 1
+        },
+        {
+            "id": 2,
+            "station": "St1",
+            "product": "UV detector assembly",
+            "worker": "Demo operator 1",
+            "reference": "DEMO-0002",
+            "start": "2026-05-25T09:06:00",
+            "end": "2026-05-25T09:31:00",
+            "quantity": 2
+        },
+        {
+            "id": 3,
+            "station": "St1",
+            "product": "UV detector assembly",
+            "worker": "Demo operator 1",
+            "reference": "DEMO-0003",
+            "start": "2026-05-25T09:46:00",
+            "end": "2026-05-25T10:15:00",
+            "quantity": 3
+        },
+        {
+            "id": 4,
+            "station": "St1",
+            "product": "UV detector assembly",
+            "worker": "Demo operator 1",
+            "reference": "DEMO-0004",
+            "start": "2026-05-25T10:33:00",
+            "end": "2026-05-25T10:54:00",
+            "quantity": 1
+        },
+        {
+            "id": 5,
+            "station": "St1",
+            "product": "UV detector assembly",
+            "worker": "Demo operator 1",
+            "reference": "DEMO-0005",
+            "start": "2026-05-25T11:15:00",
+            "end": "2026-05-25T11:40:00",
+            "quantity": 2
+        },
+        {
+            "id": 6,
+            "station": "St1",
+            "product": "UV detector assembly",
+            "worker": "Demo operator 1",
+            "reference": "DEMO-0006",
+            "start": "2026-05-25T12:04:00",
+            "end": "2026-05-25T12:33:00",
+            "quantity": 3
+        },
+        {
+            "id": 7,
+            "station": "St2",
+            "product": "Optical module",
+            "worker": "Demo operator 2",
+            "reference": "DEMO-0007",
+            "start": "2026-05-25T08:36:00",
+            "end": "2026-05-25T09:00:00",
+            "quantity": 1
+        },
+        {
+            "id": 8,
+            "station": "St2",
+            "product": "Optical module",
+            "worker": "Demo operator 2",
+            "reference": "DEMO-0008",
+            "start": "2026-05-25T09:12:00",
+            "end": "2026-05-25T09:40:00",
+            "quantity": 2
+        },
+        {
+            "id": 9,
+            "station": "St2",
+            "product": "Optical module",
+            "worker": "Demo operator 2",
+            "reference": "DEMO-0009",
+            "start": "2026-05-25T09:55:00",
+            "end": "2026-05-25T10:27:00",
+            "quantity": 3
+        },
+        {
+            "id": 10,
+            "station": "St2",
+            "product": "Optical module",
+            "worker": "Demo operator 2",
+            "reference": "DEMO-0010",
+            "start": "2026-05-25T10:45:00",
+            "end": "2026-05-25T11:09:00",
+            "quantity": 1
+        },
+        {
+            "id": 11,
+            "station": "St2",
+            "product": "Optical module",
+            "worker": "Demo operator 2",
+            "reference": "DEMO-0011",
+            "start": "2026-05-25T11:30:00",
+            "end": "2026-05-25T11:58:00",
+            "quantity": 2
+        },
+        {
+            "id": 12,
+            "station": "St2",
+            "product": "Optical module",
+            "worker": "Demo operator 2",
+            "reference": "DEMO-0012",
+            "start": "2026-05-25T12:22:00",
+            "end": "2026-05-25T12:54:00",
+            "quantity": 3
+        },
+        {
+            "id": 13,
+            "station": "St3",
+            "product": "Sensor housing",
+            "worker": "Demo operator 3",
+            "reference": "DEMO-0013",
+            "start": "2026-05-25T08:39:00",
+            "end": "2026-05-25T09:06:00",
+            "quantity": 1
+        },
+        {
+            "id": 14,
+            "station": "St3",
+            "product": "Sensor housing",
+            "worker": "Demo operator 3",
+            "reference": "DEMO-0014",
+            "start": "2026-05-25T09:18:00",
+            "end": "2026-05-25T09:49:00",
+            "quantity": 2
+        },
+        {
+            "id": 15,
+            "station": "St3",
+            "product": "Sensor housing",
+            "worker": "Demo operator 3",
+            "reference": "DEMO-0015",
+            "start": "2026-05-25T10:04:00",
+            "end": "2026-05-25T10:39:00",
+            "quantity": 3
+        },
+        {
+            "id": 16,
+            "station": "St3",
+            "product": "Sensor housing",
+            "worker": "Demo operator 3",
+            "reference": "DEMO-0016",
+            "start": "2026-05-25T10:57:00",
+            "end": "2026-05-25T11:24:00",
+            "quantity": 1
+        },
+        {
+            "id": 17,
+            "station": "St3",
+            "product": "Sensor housing",
+            "worker": "Demo operator 3",
+            "reference": "DEMO-0017",
+            "start": "2026-05-25T11:45:00",
+            "end": "2026-05-25T12:16:00",
+            "quantity": 2
+        },
+        {
+            "id": 18,
+            "station": "St3",
+            "product": "Sensor housing",
+            "worker": "Demo operator 3",
+            "reference": "DEMO-0018",
+            "start": "2026-05-25T12:40:00",
+            "end": "2026-05-25T13:15:00",
+            "quantity": 3
+        },
+        {
+            "id": 19,
+            "station": "St4",
+            "product": "Detector calibration",
+            "worker": "Demo operator 4",
+            "reference": "DEMO-0019",
+            "start": "2026-05-25T08:42:00",
+            "end": "2026-05-25T09:12:00",
+            "quantity": 1
+        },
+        {
+            "id": 20,
+            "station": "St4",
+            "product": "Detector calibration",
+            "worker": "Demo operator 4",
+            "reference": "DEMO-0020",
+            "start": "2026-05-25T09:24:00",
+            "end": "2026-05-25T09:58:00",
+            "quantity": 2
+        },
+        {
+            "id": 21,
+            "station": "St4",
+            "product": "Detector calibration",
+            "worker": "Demo operator 4",
+            "reference": "DEMO-0021",
+            "start": "2026-05-25T10:13:00",
+            "end": "2026-05-25T10:51:00",
+            "quantity": 3
+        },
+        {
+            "id": 22,
+            "station": "St4",
+            "product": "Detector calibration",
+            "worker": "Demo operator 4",
+            "reference": "DEMO-0022",
+            "start": "2026-05-25T11:09:00",
+            "end": "2026-05-25T11:39:00",
+            "quantity": 1
+        },
+        {
+            "id": 23,
+            "station": "St4",
+            "product": "Detector calibration",
+            "worker": "Demo operator 4",
+            "reference": "DEMO-0023",
+            "start": "2026-05-25T12:00:00",
+            "end": "2026-05-25T12:34:00",
+            "quantity": 2
+        },
+        {
+            "id": 24,
+            "station": "St4",
+            "product": "Detector calibration",
+            "worker": "Demo operator 4",
+            "reference": "DEMO-0024",
+            "start": "2026-05-25T12:58:00",
+            "end": "2026-05-25T13:36:00",
+            "quantity": 3
+        },
+        {
+            "id": 25,
+            "station": "St1",
+            "product": "UV detector assembly",
+            "worker": "Demo operator 1",
+            "reference": "DEMO-0025",
+            "start": "2026-05-26T08:33:00",
+            "end": "2026-05-26T08:54:00",
+            "quantity": 1
+        },
+        {
+            "id": 26,
+            "station": "St1",
+            "product": "UV detector assembly",
+            "worker": "Demo operator 1",
+            "reference": "DEMO-0026",
+            "start": "2026-05-26T09:06:00",
+            "end": "2026-05-26T09:31:00",
+            "quantity": 2
+        },
+        {
+            "id": 27,
+            "station": "St1",
+            "product": "UV detector assembly",
+            "worker": "Demo operator 1",
+            "reference": "DEMO-0027",
+            "start": "2026-05-26T09:46:00",
+            "end": "2026-05-26T10:15:00",
+            "quantity": 3
+        },
+        {
+            "id": 28,
+            "station": "St1",
+            "product": "UV detector assembly",
+            "worker": "Demo operator 1",
+            "reference": "DEMO-0028",
+            "start": "2026-05-26T10:33:00",
+            "end": "2026-05-26T10:54:00",
+            "quantity": 1
+        },
+        {
+            "id": 29,
+            "station": "St1",
+            "product": "UV detector assembly",
+            "worker": "Demo operator 1",
+            "reference": "DEMO-0029",
+            "start": "2026-05-26T11:15:00",
+            "end": "2026-05-26T11:40:00",
+            "quantity": 2
+        },
+        {
+            "id": 30,
+            "station": "St1",
+            "product": "UV detector assembly",
+            "worker": "Demo operator 1",
+            "reference": "DEMO-0030",
+            "start": "2026-05-26T12:04:00",
+            "end": "2026-05-26T12:33:00",
+            "quantity": 3
+        },
+        {
+            "id": 31,
+            "station": "St2",
+            "product": "Optical module",
+            "worker": "Demo operator 2",
+            "reference": "DEMO-0031",
+            "start": "2026-05-26T08:36:00",
+            "end": "2026-05-26T09:00:00",
+            "quantity": 1
+        },
+        {
+            "id": 32,
+            "station": "St2",
+            "product": "Optical module",
+            "worker": "Demo operator 2",
+            "reference": "DEMO-0032",
+            "start": "2026-05-26T09:12:00",
+            "end": "2026-05-26T09:40:00",
+            "quantity": 2
+        },
+        {
+            "id": 33,
+            "station": "St2",
+            "product": "Optical module",
+            "worker": "Demo operator 2",
+            "reference": "DEMO-0033",
+            "start": "2026-05-26T09:55:00",
+            "end": "2026-05-26T10:27:00",
+            "quantity": 3
+        },
+        {
+            "id": 34,
+            "station": "St2",
+            "product": "Optical module",
+            "worker": "Demo operator 2",
+            "reference": "DEMO-0034",
+            "start": "2026-05-26T10:45:00",
+            "end": "2026-05-26T11:09:00",
+            "quantity": 1
+        },
+        {
+            "id": 35,
+            "station": "St2",
+            "product": "Optical module",
+            "worker": "Demo operator 2",
+            "reference": "DEMO-0035",
+            "start": "2026-05-26T11:30:00",
+            "end": "2026-05-26T11:58:00",
+            "quantity": 2
+        },
+        {
+            "id": 36,
+            "station": "St2",
+            "product": "Optical module",
+            "worker": "Demo operator 2",
+            "reference": "DEMO-0036",
+            "start": "2026-05-26T12:22:00",
+            "end": "2026-05-26T12:54:00",
+            "quantity": 3
+        },
+        {
+            "id": 37,
+            "station": "St3",
+            "product": "Sensor housing",
+            "worker": "Demo operator 3",
+            "reference": "DEMO-0037",
+            "start": "2026-05-26T08:39:00",
+            "end": "2026-05-26T09:06:00",
+            "quantity": 1
+        },
+        {
+            "id": 38,
+            "station": "St3",
+            "product": "Sensor housing",
+            "worker": "Demo operator 3",
+            "reference": "DEMO-0038",
+            "start": "2026-05-26T09:18:00",
+            "end": "2026-05-26T09:49:00",
+            "quantity": 2
+        },
+        {
+            "id": 39,
+            "station": "St3",
+            "product": "Sensor housing",
+            "worker": "Demo operator 3",
+            "reference": "DEMO-0039",
+            "start": "2026-05-26T10:04:00",
+            "end": "2026-05-26T10:39:00",
+            "quantity": 3
+        },
+        {
+            "id": 40,
+            "station": "St3",
+            "product": "Sensor housing",
+            "worker": "Demo operator 3",
+            "reference": "DEMO-0040",
+            "start": "2026-05-26T10:57:00",
+            "end": "2026-05-26T11:24:00",
+            "quantity": 1
+        },
+        {
+            "id": 41,
+            "station": "St3",
+            "product": "Sensor housing",
+            "worker": "Demo operator 3",
+            "reference": "DEMO-0041",
+            "start": "2026-05-26T11:45:00",
+            "end": "2026-05-26T12:16:00",
+            "quantity": 2
+        },
+        {
+            "id": 42,
+            "station": "St3",
+            "product": "Sensor housing",
+            "worker": "Demo operator 3",
+            "reference": "DEMO-0042",
+            "start": "2026-05-26T12:40:00",
+            "end": "2026-05-26T13:15:00",
+            "quantity": 3
+        },
+        {
+            "id": 43,
+            "station": "St4",
+            "product": "Detector calibration",
+            "worker": "Demo operator 4",
+            "reference": "DEMO-0043",
+            "start": "2026-05-26T08:42:00",
+            "end": "2026-05-26T09:12:00",
+            "quantity": 1
+        },
+        {
+            "id": 44,
+            "station": "St4",
+            "product": "Detector calibration",
+            "worker": "Demo operator 4",
+            "reference": "DEMO-0044",
+            "start": "2026-05-26T09:24:00",
+            "end": "2026-05-26T09:58:00",
+            "quantity": 2
+        },
+        {
+            "id": 45,
+            "station": "St4",
+            "product": "Detector calibration",
+            "worker": "Demo operator 4",
+            "reference": "DEMO-0045",
+            "start": "2026-05-26T10:13:00",
+            "end": "2026-05-26T10:51:00",
+            "quantity": 3
+        },
+        {
+            "id": 46,
+            "station": "St4",
+            "product": "Detector calibration",
+            "worker": "Demo operator 4",
+            "reference": "DEMO-0046",
+            "start": "2026-05-26T11:09:00",
+            "end": "2026-05-26T11:39:00",
+            "quantity": 1
+        },
+        {
+            "id": 47,
+            "station": "St4",
+            "product": "Detector calibration",
+            "worker": "Demo operator 4",
+            "reference": "DEMO-0047",
+            "start": "2026-05-26T12:00:00",
+            "end": "2026-05-26T12:34:00",
+            "quantity": 2
+        },
+        {
+            "id": 48,
+            "station": "St4",
+            "product": "Detector calibration",
+            "worker": "Demo operator 4",
+            "reference": "DEMO-0048",
+            "start": "2026-05-26T12:58:00",
+            "end": "2026-05-26T13:36:00",
+            "quantity": 3
+        }
+    ]
+}

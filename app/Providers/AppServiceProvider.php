@@ -26,8 +26,8 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Auth::provider('environment', fn (Application $app, array $config): EnvironmentUserProvider => new EnvironmentUserProvider(
-            (string) $config['username'],
-            (string) $config['password_hash'],
+            ($config['demo'] ?? false) ? 'admin' : (string) $config['username'],
+            ($config['demo'] ?? false) ? EnvironmentUserProvider::DEMO_PASSWORD_HASH : (string) $config['password_hash'],
         ));
 
         RateLimiter::for('login', function (Request $request): Limit {

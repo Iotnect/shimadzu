@@ -22,6 +22,7 @@
         "LOG_STDERR_FORMATTER": "App\\Logging\\VercelFormatter",
         "LOG_LEVEL": "warning",
         "AUTH_USER_PROVIDER": "environment",
+        "DASHBOARD_DEMO_MODE": "true",
         "SESSION_DRIVER": "cookie",
         "SESSION_SECURE_COOKIE": "true",
         "CACHE_STORE": "file",

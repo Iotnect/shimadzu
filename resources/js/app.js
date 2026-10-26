@@ -163,12 +163,12 @@ function showMethod() {
 
 function showSource() {
     const { source } = state.data;
-    showDialog('Your production data', `<p class="dialog-copy">This workspace uses an imported Excel snapshot. The original workbook and PBIX have not been modified.</p>${details([
+    showDialog('Your production data', `<p class="dialog-copy">${source.isDemo ? 'This demo uses built-in synthetic records to demonstrate the dashboard. They are not actual production records.' : 'This workspace uses an imported Excel snapshot. The original workbook and PBIX have not been modified.'}</p>${details([
         ['Workbook', source.name], ['Worksheet', 'lc2kdet_worklog'],
         ['Coverage begins', dayLabel(source.from)], ['Coverage ends', dayLabel(source.to)],
         ['Imported job records', number(source.records)], ['Stations', state.data.stations.join(', ')],
         ['Imported on', dayLabel(source.importedAt.slice(0, 10))], ['Standard time source', source.standardSource],
-    ])}<div class="dialog-note">This is historical data, not a live feed. The workbook snapshot ends on ${dayLabel(source.to)}. New workbook changes require a new import. Production dates and times are displayed as recorded in the source.</div>`, 'DATA SOURCE & COVERAGE');
+    ])}<div class="dialog-note">${source.isDemo ? 'Sample data is included with the demo. No database or private file hosting is required.' : `This is historical data, not a live feed. The workbook snapshot ends on ${dayLabel(source.to)}. New workbook changes require a new import. Production dates and times are displayed as recorded in the source.`}</div>`, 'DATA SOURCE & COVERAGE');
 }
 
 function exportReport() {

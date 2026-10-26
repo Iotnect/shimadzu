@@ -14,6 +14,7 @@ class EnvironmentAuthenticationTest extends TestCase
 
         config([
             'auth.providers.users.driver' => 'environment',
+            'auth.providers.users.demo' => false,
             'auth.providers.users.username' => 'admin',
             'auth.providers.users.password_hash' => Hash::make('private-admin-password'),
             'session.driver' => 'cookie',
@@ -27,6 +28,26 @@ class EnvironmentAuthenticationTest extends TestCase
     {
         $this->get('/login')->assertOk()->assertSee('Welcome back')->assertDontSee('Keep me signed in');
         $this->get('/')->assertRedirect(route('login'));
+    }
+
+    public function test_demo_credentials_open_a_working_file_based_dashboard_without_a_database(): void
+    {
+        config([
+            'auth.providers.users.demo' => true,
+            'auth.providers.users.password_hash' => '',
+            'production.demo_mode' => true,
+            'production.worklog_url' => null,
+            'production.worklog_path' => storage_path('testing/missing-demo-source.json'),
+        ]);
+        Auth::forgetGuards();
+
+        $this->post('/login', ['username' => 'admin', 'password' => 'admin123'])->assertRedirect(route('dashboard'));
+        $this->assertAuthenticated();
+
+        $this->get('/')->assertOk()->assertSee('Demo workspace');
+        $this->getJson('/dashboard/data?date=2026-05-26')
+            ->assertOk()->assertJsonPath('source.isDemo', true)->assertJsonCount(4, 'summary.rows')->assertJsonCount(24, 'jobs');
+        $this->get('/stations/St1')->assertOk()->assertSee('Station 1');
     }
 
     public function test_configured_credentials_create_a_session_without_a_database(): void

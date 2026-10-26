@@ -67,6 +67,7 @@ return [
             'model' => env('AUTH_MODEL', User::class),
             'username' => mb_strtolower((string) env('DASHBOARD_ADMIN_USERNAME', 'admin')),
             'password_hash' => env('DASHBOARD_ADMIN_PASSWORD_HASH', ''),
+            'demo' => (bool) env('DASHBOARD_DEMO_MODE', false),
         ],
 
         // 'users' => [

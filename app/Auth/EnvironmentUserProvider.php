@@ -10,6 +10,8 @@ use SensitiveParameter;
 
 class EnvironmentUserProvider implements UserProvider
 {
+    public const DEMO_PASSWORD_HASH = '$2y$12$g4.HyJWKUly61h4GrfsNKeKFEYmQgUvRWKp4cskUjTJ2ge17BjHWK';
+
     public function __construct(private string $username, #[SensitiveParameter] private string $passwordHash) {}
 
     public function retrieveById(mixed $identifier): ?Authenticatable

@@ -2,6 +2,12 @@
 
 namespace App\Services;
 
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\RequestException;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
+use JsonException;
+
 class ProductionDashboard
 {
     private const STANDARD_TIMES = ['St1' => 25.515, 'St2' => 37.24, 'St3' => 23.695, 'St4' => 14.8925];
@@ -9,7 +15,58 @@ class ProductionDashboard
     /** @return array<string, mixed> */
     public function snapshot(): array
     {
-        return json_decode(file_get_contents(storage_path('app/private/det-worklog.json')), true, flags: JSON_THROW_ON_ERROR);
+        $url = config('production.worklog_url');
+
+        if (is_string($url) && $url !== '') {
+            abort_unless(filter_var($url, FILTER_VALIDATE_URL) && parse_url($url, PHP_URL_SCHEME) === 'https', 503, 'Production data is temporarily unavailable.');
+
+            $token = config('production.worklog_token');
+
+            return Cache::remember('production-snapshot:'.hash('sha256', $url.'|'.$token), 300, function () use ($url, $token): array {
+                $request = Http::acceptJson()->connectTimeout(3)->timeout(10)->withoutRedirecting();
+
+                if (is_string($token) && $token !== '') {
+                    $request = $request->withToken($token);
+                }
+
+                try {
+                    $response = $request->get($url)->throw();
+                    abort_unless($response->successful(), 503, 'Production data is temporarily unavailable.');
+
+                    return $this->decodeSnapshot($response->body());
+                } catch (ConnectionException|RequestException $exception) {
+                    abort(503, 'Production data is temporarily unavailable.');
+                }
+            });
+        }
+
+        $path = config('production.worklog_path');
+        abort_unless(is_string($path) && is_file($path) && is_readable($path), 503, 'Production data is temporarily unavailable.');
+
+        return $this->decodeSnapshot(file_get_contents($path));
+    }
+
+    /** @return array<string, mixed> */
+    private function decodeSnapshot(string $contents): array
+    {
+        try {
+            $snapshot = json_decode($contents, true, flags: JSON_THROW_ON_ERROR);
+        } catch (JsonException $exception) {
+            abort(503, 'Production data is temporarily unavailable.');
+        }
+
+        abort_unless(
+            is_array($snapshot)
+            && is_string($snapshot['source'] ?? null)
+            && is_string($snapshot['importedAt'] ?? null)
+            && is_array($snapshot['jobs'] ?? null)
+            && array_is_list($snapshot['jobs'])
+            && $snapshot['jobs'] !== [],
+            503,
+            'Production data is temporarily unavailable.',
+        );
+
+        return $snapshot;
     }
 
     /** @return array<string, mixed> */

@@ -19,6 +19,7 @@
         "APP_ENV": "production",
         "APP_DEBUG": "false",
         "LOG_CHANNEL": "stderr",
+        "LOG_STDERR_FORMATTER": "App\\Logging\\VercelFormatter",
         "LOG_LEVEL": "warning",
         "DB_CONNECTION": "pgsql",
         "DB_SSLMODE": "require",

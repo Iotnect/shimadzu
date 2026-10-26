@@ -77,9 +77,9 @@ button:disabled { cursor: default; }
 .avatar, .profile .avatar { background: var(--surface-hover); color: var(--ink); border: 1px solid var(--line); }
 .profile-dot { background: var(--chart-running); }
 .sidebar-logout { margin: 0 4px 18px; }
-.logout-button { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 7px; background: var(--surface); color: var(--muted); font-size: 13px; }
+.logout-button { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; padding: 10px 12px; border: 1px solid var(--brand); border-radius: 7px; background: var(--brand); color: #fff; font-size: 13px; font-weight: 600; }
 .logout-button .icon { width: 15px; height: 15px; }
-.logout-button:hover { background: var(--brand-tint); color: var(--brand-ink); border-color: var(--brand-ink); }
+.logout-button:hover { background: var(--brand-hover); border-color: var(--brand-hover); }
 .topbar { height: 68px; background: var(--surface); border-color: var(--line); }
 .breadcrumb { color: var(--muted); font-size: 13px; }
 .breadcrumb strong { color: var(--ink); font-weight: 600; }

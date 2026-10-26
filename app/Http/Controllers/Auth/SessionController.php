@@ -27,7 +27,7 @@ class SessionController extends Controller
         if (! Auth::attempt([
             'username' => mb_strtolower($credentials['username']),
             'password' => $credentials['password'],
-        ], $request->boolean('remember'))) {
+        ], $request->boolean('remember') && config('auth.providers.users.driver') !== 'environment')) {
             throw ValidationException::withMessages([
                 'username' => 'The username or password is incorrect.',
             ]);

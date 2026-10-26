@@ -21,11 +21,10 @@
         "LOG_CHANNEL": "stderr",
         "LOG_STDERR_FORMATTER": "App\\Logging\\VercelFormatter",
         "LOG_LEVEL": "warning",
-        "DB_CONNECTION": "pgsql",
-        "DB_SSLMODE": "require",
-        "SESSION_DRIVER": "database",
+        "AUTH_USER_PROVIDER": "environment",
+        "SESSION_DRIVER": "cookie",
         "SESSION_SECURE_COOKIE": "true",
-        "CACHE_STORE": "database",
+        "CACHE_STORE": "file",
         "QUEUE_CONNECTION": "sync",
         "VIEW_COMPILED_PATH": "/tmp/shimadzu/framework/views"
     }

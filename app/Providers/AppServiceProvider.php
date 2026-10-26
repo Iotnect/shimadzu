@@ -2,8 +2,11 @@
 
 namespace App\Providers;
 
+use App\Auth\EnvironmentUserProvider;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 
@@ -22,6 +25,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Auth::provider('environment', fn (Application $app, array $config): EnvironmentUserProvider => new EnvironmentUserProvider(
+            (string) $config['username'],
+            (string) $config['password_hash'],
+        ));
+
         RateLimiter::for('login', function (Request $request): Limit {
             $username = $request->input('username');
 

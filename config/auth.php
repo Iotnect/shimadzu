@@ -63,8 +63,10 @@ return [
 
     'providers' => [
         'users' => [
-            'driver' => 'eloquent',
+            'driver' => env('AUTH_USER_PROVIDER', 'eloquent'),
             'model' => env('AUTH_MODEL', User::class),
+            'username' => mb_strtolower((string) env('DASHBOARD_ADMIN_USERNAME', 'admin')),
+            'password_hash' => env('DASHBOARD_ADMIN_PASSWORD_HASH', ''),
         ],
 
         // 'users' => [

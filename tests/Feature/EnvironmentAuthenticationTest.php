@@ -77,6 +77,18 @@ class EnvironmentAuthenticationTest extends TestCase
         $this->assertGuest();
     }
 
+    public function test_signing_out_the_configured_admin_ends_the_session_without_a_database(): void
+    {
+        $this->post('/login', ['username' => 'admin', 'password' => 'private-admin-password'])
+            ->assertRedirect(route('dashboard'));
+
+        $this->post('/logout')->assertRedirect(route('login'));
+
+        $this->assertGuest();
+        $this->get('/')->assertRedirect(route('login'));
+        $this->getJson('/dashboard/data?date=2026-05-26')->assertUnauthorized();
+    }
+
     public function test_a_missing_admin_hash_fails_closed(): void
     {
         config(['auth.providers.users.password_hash' => '']);

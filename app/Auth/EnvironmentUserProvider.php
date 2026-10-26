@@ -63,6 +63,7 @@ class EnvironmentUserProvider implements UserProvider
             'name' => 'Administrator',
             'username' => $this->username,
             'password' => $this->passwordHash,
+            'remember_token' => null,
         ]);
     }
 }

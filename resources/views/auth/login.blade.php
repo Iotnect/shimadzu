@@ -1,5 +1,8 @@
 @php
     $mode = $mode ?? 'login';
+    $acceptsUsername = $mode === 'login'
+        && config('auth.providers.users.driver') === 'environment'
+        && config('auth.providers.users.username', '') !== '';
     [$heading, $description, $action, $submitLabel, $pendingLabel] = match ($mode) {
         'forgot' => ['Forgot password', 'Enter your account email to request a reset link.', 'password.email', 'Send reset link', 'Sending…'],
         'reset' => ['Reset password', 'Choose a new password with at least 12 characters.', 'password.update', 'Reset password', 'Resetting…'],
@@ -48,10 +51,10 @@
                         <input type="hidden" name="token" value="{{ $token }}">
                     @endif
                     <div class="auth-field">
-                        <label for="email">Email</label>
+                        <label for="email">{{ $acceptsUsername ? 'Username or email' : 'Email' }}</label>
                         <div class="auth-input-wrap">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
-                            <input id="email" name="email" type="email" value="{{ old('email', $email ?? '') }}" placeholder="Enter your email" autocomplete="username" maxlength="254" autocapitalize="none" spellcheck="false" required @if($errors->has('email')) aria-invalid="true" @endif>
+                            <input id="email" name="email" type="{{ $acceptsUsername ? 'text' : 'email' }}" value="{{ old('email', $email ?? '') }}" placeholder="{{ $acceptsUsername ? 'Enter your username or email' : 'Enter your email' }}" autocomplete="username" maxlength="254" autocapitalize="none" spellcheck="false" required @if($errors->has('email')) aria-invalid="true" @endif>
                         </div>
                     </div>
                     @if ($mode !== 'forgot')

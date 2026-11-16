@@ -38,7 +38,7 @@ class AppServiceProvider extends ServiceProvider
         ], absolute: false));
 
         RateLimiter::for('login', function (Request $request): Limit {
-            $email = $request->input('email');
+            $email = config('auth.providers.users.driver') === 'environment' ? null : $request->input('email');
 
             return Limit::perMinute(5)
                 ->by(hash('sha256', (is_string($email) ? mb_strtolower($email) : '').'|'.$request->ip()))

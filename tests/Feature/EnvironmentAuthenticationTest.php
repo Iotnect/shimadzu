@@ -69,6 +69,18 @@ class EnvironmentAuthenticationTest extends TestCase
         $this->withUnencryptedCookies($cookies)->get('/setting')->assertOk()->assertSee('Appearance');
     }
 
+    public function test_a_configured_username_can_sign_in_to_the_same_account(): void
+    {
+        config(['auth.providers.users.username' => 'operator']);
+
+        $this->get('/login')->assertOk()->assertSee('Username or email');
+        $this->post('/login', ['email' => 'Operator', 'password' => 'private-admin-password'])
+            ->assertRedirect(route('dashboard'));
+
+        $this->assertAuthenticated();
+        $this->assertSame('admin@example.com', Auth::user()->email);
+    }
+
     public function test_incorrect_passwords_are_rejected_without_querying_a_database(): void
     {
         $this->from('/login')->post('/login', ['email' => 'admin@example.com', 'password' => 'wrong-password'])
@@ -123,11 +135,13 @@ class EnvironmentAuthenticationTest extends TestCase
 
     public function test_repeated_invalid_logins_are_still_throttled(): void
     {
+        config(['auth.providers.users.username' => 'operator']);
+
         for ($attempt = 0; $attempt < 5; $attempt++) {
             $this->post('/login', ['email' => 'admin@example.com', 'password' => 'wrong-password']);
         }
 
-        $this->post('/login', ['email' => 'admin@example.com', 'password' => 'wrong-password'])
+        $this->post('/login', ['email' => 'operator', 'password' => 'wrong-password'])
             ->assertSessionHasErrors(['email' => 'Too many sign-in attempts. Please try again in one minute.']);
     }
 

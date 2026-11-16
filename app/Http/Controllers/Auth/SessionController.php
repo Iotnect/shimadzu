@@ -18,18 +18,30 @@ class SessionController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        $environmentAccount = config('auth.providers.users.driver') === 'environment';
+        $username = $environmentAccount ? config('auth.providers.users.username', '') : '';
+        $emailRules = ['required', 'string', 'max:254'];
+        if ($username === '') {
+            $emailRules[] = 'email';
+        }
+
         $credentials = $request->validate([
-            'email' => ['required', 'string', 'email', 'max:254'],
+            'email' => $emailRules,
             'password' => ['required', 'string'],
             'remember' => ['sometimes', 'boolean'],
         ]);
 
+        $identifier = mb_strtolower($credentials['email']);
+        $email = $username !== '' && hash_equals($username, $identifier)
+            ? config('auth.providers.users.email')
+            : $identifier;
+
         if (! Auth::attempt([
-            'email' => mb_strtolower($credentials['email']),
+            'email' => $email,
             'password' => $credentials['password'],
-        ], $request->boolean('remember') && config('auth.providers.users.driver') !== 'environment')) {
+        ], $request->boolean('remember') && ! $environmentAccount)) {
             throw ValidationException::withMessages([
-                'email' => 'The email or password is incorrect.',
+                'email' => $username !== '' ? 'The username, email, or password is incorrect.' : 'The email or password is incorrect.',
             ]);
         }
 

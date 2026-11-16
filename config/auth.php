@@ -66,6 +66,7 @@ return [
             'driver' => env('AUTH_USER_PROVIDER', 'eloquent'),
             'model' => env('AUTH_MODEL', User::class),
             'email' => mb_strtolower((string) env('DASHBOARD_ADMIN_EMAIL', '')),
+            'username' => mb_strtolower((string) env('DASHBOARD_ADMIN_USERNAME', '')),
             'password_hash' => env('DASHBOARD_ADMIN_PASSWORD_HASH', ''),
         ],
 

@@ -19,17 +19,17 @@ class SessionController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $credentials = $request->validate([
-            'username' => ['required', 'string', 'max:80'],
+            'email' => ['required', 'string', 'email', 'max:254'],
             'password' => ['required', 'string'],
             'remember' => ['sometimes', 'boolean'],
         ]);
 
         if (! Auth::attempt([
-            'username' => mb_strtolower($credentials['username']),
+            'email' => mb_strtolower($credentials['email']),
             'password' => $credentials['password'],
         ], $request->boolean('remember') && config('auth.providers.users.driver') !== 'environment')) {
             throw ValidationException::withMessages([
-                'username' => 'The username or password is incorrect.',
+                'email' => 'The email or password is incorrect.',
             ]);
         }
 

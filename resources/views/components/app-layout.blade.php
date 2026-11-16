@@ -1,11 +1,11 @@
-@props(['title' => 'Production overview'])
+@props(['title' => 'Production dashboard'])
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#e31b23">
-    <meta name="description" content="DET production cycle times, station activity, and daily performance in one clear workspace.">
+    <meta name="description" content="Monitor production cycle times, station activity, and daily performance across sensors.">
     <title>Shimadzu · {{ $title }}</title>
     <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}?v=shimadzu">
     <link rel="icon" type="image/x-icon" sizes="16x16 32x32 48x48" href="{{ asset('favicon.ico') }}?v=shimadzu">
@@ -44,16 +44,13 @@
             <div class="nav-label">WORKSPACE</div>
             <nav class="primary-nav" aria-label="Main navigation">
                 <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" @if(request()->routeIs('dashboard')) aria-current="page" @endif><x-icon name="grid" />Overview @if(request()->routeIs('dashboard'))<span class="nav-active-dot"></span>@endif</a>
-                @foreach(['St1', 'St2', 'St3', 'St4'] as $station)
-                    <a href="{{ route('stations.show', $station) }}" class="nav-link {{ request()->routeIs('stations.show') && request()->route('station') === $station ? 'active' : '' }}" @if(request()->routeIs('stations.show') && request()->route('station') === $station) aria-current="page" @endif><x-icon name="chart" />Station {{ substr($station, 2) }}</a>
-                @endforeach
             </nav>
             <div class="nav-label management-label">MANAGEMENT</div>
             <nav class="primary-nav" aria-label="Management navigation">
-                <a href="{{ route('settings') }}" class="nav-link {{ request()->routeIs('settings') ? 'active' : '' }}" @if(request()->routeIs('settings')) aria-current="page" @endif><x-icon name="settings" />Setting</a>
+                <a href="{{ route('settings') }}" class="nav-link {{ request()->routeIs('settings') ? 'active' : '' }}" @if(request()->routeIs('settings')) aria-current="page" @endif><x-icon name="settings" />Settings</a>
             </nav>
             <div class="sidebar-bottom">
-                <div class="profile"><div class="avatar">AD</div><div><strong>{{ auth()->user()->name }}</strong><small>Shimadzu · DET workspace</small></div><span class="profile-dot"></span></div>
+                <div class="profile"><div class="avatar">AD</div><div><strong>{{ auth()->user()->name }}</strong><small>Shimadzu · Production workspace</small></div><span class="profile-dot"></span></div>
                 <form method="POST" action="{{ route('logout') }}" class="sidebar-logout">
                     @csrf
                     <button type="submit" class="logout-button">Sign out <x-icon name="arrow" /></button>
@@ -63,7 +60,7 @@
         <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
         <div class="main-shell">
-            <header class="topbar"><div class="breadcrumb"><button class="icon-button mobile-menu" aria-label="Open navigation" aria-expanded="false" id="menu-toggle"><x-icon name="menu" /></button><span>{{ request()->routeIs('settings') ? 'Management' : 'Workspace' }}</span><x-icon name="arrow" /><strong>{{ $title }}</strong></div><div class="topbar-right">@if(request()->routeIs('dashboard', 'stations.show'))<button class="icon-button" aria-label="Open metric guide" data-dialog="method"><x-icon name="help" /></button>@endif</div></header>
+            <header class="topbar"><div class="breadcrumb"><button class="icon-button mobile-menu" aria-label="Open navigation" aria-expanded="false" id="menu-toggle"><x-icon name="menu" /></button><span>{{ request()->routeIs('settings') ? 'Management' : 'Workspace' }}</span><x-icon name="arrow" /><strong>{{ $title }}</strong></div><div class="topbar-right">@if(request()->routeIs('dashboard', 'stations.show', 'sensors.show'))<button class="icon-button" aria-label="Open metric guide" data-dialog="method"><x-icon name="help" /></button>@endif</div></header>
             <main id="main">{{ $slot }}</main>
         </div>
     </div>

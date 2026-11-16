@@ -3,6 +3,11 @@ import '../css/dashboard-theme.css';
 import { mountAppearanceSettings } from './components/appearance-settings';
 
 mountAppearanceSettings();
+document.querySelector('#station-parameters-form')?.addEventListener('submit', event => {
+    const button = event.target.querySelector('button[type="submit"]');
+    button.disabled = true;
+    button.textContent = 'Saving…';
+});
 window.addEventListener('storage', (event) => {
     if (event.key === 'shimadzu-theme' || event.key === null) {
         document.documentElement.dataset.theme = event.key !== null && event.newValue === 'dark' ? 'dark' : 'light';

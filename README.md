@@ -72,13 +72,15 @@ Use station identifiers `St1` through `St5` and timestamps in the source's local
 
 ### Login account
 
-Create an account with a password of at least eight characters:
+Create an account with an email address and a password of at least 12 characters:
 
 ```sh
-php artisan app:create-admin admin
+php artisan app:create-admin admin@example.com
 ```
 
-Enter the password at the secure prompt. Usernames accept letters, numbers, dots, underscores, and hyphens, up to 80 characters, and are stored in lowercase. Running the command again for the same username updates that account and its password.
+Enter the password at the secure prompt. Running the command again for the same email updates that account's password.
+
+With Laragon Mailpit running, the local SMTP settings send password reset messages to the test inbox at http://localhost:8025.
 
 ### Start the application
 

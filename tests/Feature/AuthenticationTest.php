@@ -13,14 +13,14 @@ class AuthenticationTest extends TestCase
 
     public function test_guests_can_view_the_shimadzu_login_form(): void
     {
-        $this->get('/login')->assertOk()->assertSee('SHIMADZU')->assertSee('Welcome back')->assertSee('name="username"', false);
+        $this->get('/login')->assertOk()->assertSee('SHIMADZU')->assertSee('Welcome back')->assertSee('name="email"', false);
     }
 
     public function test_correct_credentials_create_an_authenticated_session(): void
     {
-        $user = User::factory()->create(['username' => 'admin', 'password' => 'admin123']);
+        $user = User::factory()->create(['email' => 'admin@example.com', 'password' => 'known-test-password']);
 
-        $this->post('/login', ['username' => 'ADMIN', 'password' => 'admin123'])
+        $this->post('/login', ['email' => 'ADMIN@EXAMPLE.COM', 'password' => 'known-test-password'])
             ->assertRedirect(route('dashboard'));
 
         $this->assertAuthenticatedAs($user);
@@ -28,11 +28,11 @@ class AuthenticationTest extends TestCase
 
     public function test_invalid_credentials_do_not_authenticate_or_flash_the_password(): void
     {
-        User::factory()->create(['username' => 'admin', 'password' => 'admin123']);
+        User::factory()->create(['email' => 'admin@example.com', 'password' => 'known-test-password']);
 
-        $this->from('/login')->post('/login', ['username' => 'admin', 'password' => 'incorrect'])
+        $this->from('/login')->post('/login', ['email' => 'admin@example.com', 'password' => 'incorrect'])
             ->assertRedirect('/login')
-            ->assertSessionHasErrors(['username' => 'The username or password is incorrect.'])
+            ->assertSessionHasErrors(['email' => 'The email or password is incorrect.'])
             ->assertSessionMissing('_old_input.password');
 
         $this->assertGuest();
@@ -40,7 +40,7 @@ class AuthenticationTest extends TestCase
 
     public function test_logout_ends_the_session_and_protects_the_dashboard_again(): void
     {
-        $user = User::factory()->create(['username' => 'admin']);
+        $user = User::factory()->create(['email' => 'admin@example.com']);
 
         $this->actingAs($user)->post('/logout')->assertRedirect(route('login'));
 
@@ -66,29 +66,29 @@ class AuthenticationTest extends TestCase
         $this->actingAs($user)->get('/login')->assertRedirect(route('dashboard'));
     }
 
-    public function test_login_requires_username_and_password(): void
+    public function test_login_requires_email_and_password(): void
     {
-        $this->post('/login')->assertSessionHasErrors(['username', 'password']);
+        $this->post('/login')->assertSessionHasErrors(['email', 'password']);
     }
 
     public function test_login_throttles_repeated_attempts(): void
     {
         for ($attempt = 0; $attempt < 5; $attempt++) {
-            $this->post('/login', ['username' => 'missing', 'password' => 'incorrect']);
+            $this->post('/login', ['email' => 'missing@example.com', 'password' => 'incorrect']);
         }
 
-        $this->post('/login', ['username' => 'missing', 'password' => 'incorrect'])
+        $this->post('/login', ['email' => 'missing@example.com', 'password' => 'incorrect'])
             ->assertRedirect(route('login'))
-            ->assertSessionHasErrors(['username' => 'Too many sign-in attempts. Please try again in one minute.']);
+            ->assertSessionHasErrors(['email' => 'Too many sign-in attempts. Please try again in one minute.']);
 
         $this->assertGuest();
     }
 
     public function test_remember_option_sets_a_remember_token(): void
     {
-        $user = User::factory()->create(['username' => 'admin', 'password' => 'admin123', 'remember_token' => null]);
+        $user = User::factory()->create(['email' => 'admin@example.com', 'password' => 'known-test-password', 'remember_token' => null]);
 
-        $this->post('/login', ['username' => 'admin', 'password' => 'admin123', 'remember' => '1'])
+        $this->post('/login', ['email' => 'admin@example.com', 'password' => 'known-test-password', 'remember' => '1'])
             ->assertRedirect(route('dashboard'));
 
         $this->assertNotNull($user->fresh()->remember_token);
@@ -96,10 +96,10 @@ class AuthenticationTest extends TestCase
 
     public function test_create_admin_command_stores_a_hashed_password(): void
     {
-        $this->artisan('app:create-admin', ['username' => 'admin', '--password' => 'admin123'])->assertExitCode(0);
+        $this->artisan('app:create-admin', ['email' => 'admin@example.com', '--password' => 'known-test-password'])->assertExitCode(0);
 
-        $admin = User::query()->where('username', 'admin')->sole();
-        $this->assertTrue(Hash::check('admin123', $admin->password));
-        $this->assertNotSame('admin123', $admin->password);
+        $admin = User::query()->where('email', 'admin@example.com')->sole();
+        $this->assertTrue(Hash::check('known-test-password', $admin->password));
+        $this->assertNotSame('known-test-password', $admin->password);
     }
 }

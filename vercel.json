@@ -11,6 +11,7 @@
         }
     },
     "routes": [
+        { "src": "/(?:storage|resources|config|app|bootstrap|database|routes|vendor)(?:/.*)?", "status": 404 },
         { "src": "/index.php", "dest": "/api/index.php" },
         { "handle": "filesystem" },
         { "src": "/(.*)", "dest": "/api/index.php" }
@@ -22,7 +23,7 @@
         "LOG_STDERR_FORMATTER": "App\\Logging\\VercelFormatter",
         "LOG_LEVEL": "warning",
         "AUTH_USER_PROVIDER": "environment",
-        "DASHBOARD_DEMO_MODE": "true",
+        "DASHBOARD_DEMO_MODE": "false",
         "SESSION_DRIVER": "cookie",
         "SESSION_SECURE_COOKIE": "true",
         "CACHE_STORE": "file",

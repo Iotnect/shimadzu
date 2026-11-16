@@ -11,6 +11,7 @@ tests
 database/*.sqlite
 database/*.sqlite-*
 storage/app/private/*
+!storage/app/private/det-worklog.json
 storage/logs/*
 storage/framework/cache/*
 storage/framework/sessions/*

@@ -7,7 +7,7 @@ use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 
-#[Signature('app:create-admin {username} {--password= : The initial password; otherwise prompt securely}')]
+#[Signature('app:create-admin {email} {--password= : The initial password; otherwise prompt securely}')]
 #[Description('Create or update the local dashboard administrator')]
 class CreateAdmin extends Command
 {
@@ -16,18 +16,17 @@ class CreateAdmin extends Command
      */
     public function handle(): int
     {
-        $username = mb_strtolower((string) $this->argument('username'));
+        $email = mb_strtolower(trim((string) $this->argument('email')));
         $password = $this->option('password') ?? $this->secret('Password');
 
-        if (! preg_match('/^[a-z0-9._-]{1,80}$/', $username) || ! is_string($password) || mb_strlen($password) < 8) {
-            $this->error('Use a valid username and a password of at least 8 characters.');
+        if (strlen($email) > 254 || ! filter_var($email, FILTER_VALIDATE_EMAIL) || ! is_string($password) || mb_strlen($password) < 12) {
+            $this->error('Use a valid email and a password of at least 12 characters.');
 
             return self::FAILURE;
         }
 
-        User::query()->updateOrCreate(['username' => $username], [
+        User::query()->updateOrCreate(['email' => $email], [
             'name' => 'Administrator',
-            'email' => $username.'@localhost',
             'password' => $password,
         ]);
 

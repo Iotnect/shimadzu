@@ -20,8 +20,7 @@ class SettingsTest extends TestCase
             ->assertViewIs('settings')
             ->assertSee('MANAGEMENT')
             ->assertSee('Appearance')
-            ->assertSee('Dark mode')
-            ->assertSee('role="switch"', false)
+            ->assertSee('id="appearance-settings"', false)
             ->assertSee('Sign out');
     }
 }

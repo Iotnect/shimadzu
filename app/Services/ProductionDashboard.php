@@ -10,7 +10,46 @@ use JsonException;
 
 class ProductionDashboard
 {
-    private const STANDARD_TIMES = ['St1' => 25.515, 'St2' => 37.24, 'St3' => 23.695, 'St4' => 14.8925];
+    public const DEFAULT_SENSOR = 'lc2kdet';
+
+    /** @var array{generation: string, sensors: list<string>}|null */
+    private ?array $sensorCatalog = null;
+
+    public function __construct(private StationSettings $settings) {}
+
+    /** @return list<string> */
+    public function sensors(): array
+    {
+        return $this->catalog()['sensors'];
+    }
+
+    /** @return array{generation: string, sensors: list<string>} */
+    private function catalog(): array
+    {
+        if ($this->sensorCatalog !== null) {
+            return $this->sensorCatalog;
+        }
+
+        $directory = config('production.sensor_worklog_directory');
+        $path = $directory.'/index.json';
+        if (! is_string($directory) || $directory === '' || ! is_file($path)) {
+            return $this->sensorCatalog = ['generation' => '', 'sensors' => [self::DEFAULT_SENSOR]];
+        }
+
+        $catalog = json_decode(file_get_contents($path), true);
+        abort_unless(
+            is_string($catalog['generation'] ?? null)
+            && preg_match('/^[a-f0-9-]{36}$/D', $catalog['generation'])
+            && is_array($catalog['sensors'] ?? null)
+            && array_is_list($catalog['sensors'])
+            && $catalog['sensors'] !== []
+            && collect($catalog['sensors'])->every(fn (mixed $sensor): bool => is_string($sensor) && preg_match('/^[a-z0-9]+$/D', $sensor)),
+            503,
+            'Production data is temporarily unavailable.',
+        );
+
+        return $this->sensorCatalog = $catalog;
+    }
 
     /** @return array<string, mixed> */
     public function snapshot(): array
@@ -75,31 +114,78 @@ class ProductionDashboard
     }
 
     /** @return array<string, mixed> */
-    public function overview(?string $date = null, string $station = 'all'): array
+    private function sensorSnapshot(string $sensor): array
     {
-        $snapshot = $this->snapshot();
+        $catalog = $this->catalog();
+        abort_unless(in_array($sensor, $catalog['sensors'], true), 404);
+
+        if ($catalog['generation'] === '') {
+            return $this->snapshot();
+        }
+
+        $path = config('production.sensor_worklog_directory').'/'.$catalog['generation'].'/'.$sensor.'.json';
+        abort_unless(is_readable($path), 503, 'Production data is temporarily unavailable.');
+
+        return $this->decodeSnapshot(file_get_contents($path));
+    }
+
+    /** @return list<string> */
+    public function stationNames(string $sensor): array
+    {
+        $stations = array_values(array_unique(array_column($this->sensorSnapshot($sensor)['jobs'], 'station')));
+        natsort($stations);
+
+        return array_values($stations);
+    }
+
+    /** @return array<string, mixed> */
+    public function overview(
+        ?string $date = null,
+        string $station = 'all',
+        ?string $sensor = null,
+        ?string $from = null,
+        ?string $to = null,
+    ): array {
+        $catalog = $this->catalog();
+        $sensor ??= in_array(self::DEFAULT_SENSOR, $catalog['sensors'], true) ? self::DEFAULT_SENSOR : $catalog['sensors'][0];
+        $snapshot = $this->sensorSnapshot($sensor);
+
         $dates = array_values(array_unique(array_map(fn (array $job): string => substr($job['start'], 0, 10), $snapshot['jobs'])));
         sort($dates);
         $stations = array_values(array_unique(array_column($snapshot['jobs'], 'station')));
-        sort($stations);
-        $date ??= end($dates);
-        $jobs = array_values(array_filter($snapshot['jobs'], fn (array $job): bool => str_starts_with($job['start'], $date) && ($station === 'all' || $job['station'] === $station)));
+        natsort($stations);
+        $stations = array_values($stations);
+        $latest = end($dates);
+        $from ??= $date ?? $latest;
+        $to ??= $date ?? $latest;
+        $periodDates = array_values(array_filter($dates, fn (string $day): bool => $day >= $from && $day <= $to));
+        $date = $date !== null && $date >= $from && $date <= $to ? $date : (end($periodDates) ?: $to);
+        $jobs = array_values(array_filter($snapshot['jobs'], function (array $job) use ($from, $to, $station): bool {
+            $day = substr($job['start'], 0, 10);
+
+            return $day >= $from && $day <= $to && ($station === 'all' || $job['station'] === $station);
+        }));
         usort($jobs, fn (array $left, array $right): int => [$left['start'], $left['id']] <=> [$right['start'], $right['id']]);
         $selectedStations = $station === 'all' ? $stations : [$station];
-        $previousDates = array_values(array_filter($dates, fn (string $day): bool => $day < $date));
+        $previousDates = $from === $to ? array_values(array_filter($dates, fn (string $day): bool => $day < $date)) : [];
         $previousDate = $previousDates === [] ? null : end($previousDates);
         $previousJobs = array_values(array_filter($snapshot['jobs'], fn (array $job): bool => $previousDate !== null && str_starts_with($job['start'], $previousDate) && ($station === 'all' || $job['station'] === $station)));
+        $summary = $this->summarize($jobs, $selectedStations, $from === $to ? 1 : count($periodDates), $sensor, $date, $from === $to ? [$from] : $periodDates);
 
         return [
-            'date' => $date, 'station' => $station, 'dates' => $dates, 'stations' => $stations,
-            'summary' => $this->summarize($jobs, $selectedStations),
-            'previous' => $previousDate === null ? null : ['date' => $previousDate, ...$this->summarize($previousJobs, $selectedStations)],
+            'sensor' => $sensor, 'sensors' => $catalog['sensors'],
+            'sensorLabels' => config('production.sensor_labels', []),
+            'date' => $date, 'from' => $from, 'to' => $to, 'periodDates' => $periodDates,
+            'station' => $station, 'dates' => $dates, 'stations' => $stations,
+            'summary' => $summary,
+            'previous' => $previousDate === null ? null : ['date' => $previousDate, ...$this->summarize($previousJobs, $selectedStations, sensor: $sensor, workDates: [$previousDate])],
             'jobs' => $jobs,
             'source' => [
                 'isDemo' => (bool) ($snapshot['demo'] ?? false),
                 'name' => $snapshot['source'], 'importedAt' => $snapshot['importedAt'],
-                'records' => count($snapshot['jobs']), 'from' => $dates[0], 'to' => end($dates),
-                'standardSource' => 'DET cycle timeline.pbix',
+                'records' => count($snapshot['jobs']), 'from' => $dates[0], 'to' => $latest,
+                'worksheet' => $snapshot['worksheet'] ?? $sensor.'_worklog',
+                'standardSource' => $summary['usesCustomSettings'] ? 'Station Settings' : ($sensor === self::DEFAULT_SENSOR ? 'Original cycle timeline report' : null),
             ],
         ];
     }
@@ -107,59 +193,99 @@ class ProductionDashboard
     /**
      * @param  array<int, array<string, mixed>>  $jobs
      * @param  array<int, string>  $stations
+     * @param  list<string>|null  $workDates
      * @return array<string, mixed>
      */
-    public function summarize(array $jobs, array $stations): array
+    public function summarize(array $jobs, array $stations, int $workdays = 1, string $sensor = self::DEFAULT_SENSOR, ?string $timelineDate = null, ?array $workDates = null): array
     {
         $rows = [];
         $segments = [];
+        $runningCount = 0;
+        $idleCount = 0;
+        $workDates ??= array_values(array_unique(array_map(fn (array $job): string => substr($job['start'], 0, 10), $jobs)));
+        if ($workDates === [] && $workdays > 0) {
+            $workDates = [$timelineDate ?? now('Asia/Kuala_Lumpur')->toDateString()];
+        }
+        sort($workDates);
+        $versions = $this->settings->versions($sensor, $workDates === [] ? '0001-01-01' : end($workDates));
+        $usesCustomSettings = false;
+        $jobsByStation = [];
+        foreach ($jobs as $job) {
+            $jobsByStation[$job['station']][] = $job;
+        }
 
         foreach ($stations as $station) {
-            $stationJobs = array_values(array_filter($jobs, fn (array $job): bool => $job['station'] === $station));
+            $parameters = [];
+            foreach ($workDates as $day) {
+                $parameters[$day] = $this->settings->resolve($sensor, $station, $day, $versions[$station] ?? []);
+                $usesCustomSettings = $usesCustomSettings || $parameters[$day]['effective_from'] !== null;
+            }
+            $dailyMinutes = array_sum(array_column($parameters, 'working'));
+            $standards = array_values(array_unique(array_column($parameters, 'standard'), SORT_REGULAR));
+            $standard = count($standards) === 1 ? $standards[0] : null;
+            $stationJobs = $jobsByStation[$station] ?? [];
             usort($stationJobs, fn (array $left, array $right): int => [$left['start'], $left['id']] <=> [$right['start'], $right['id']]);
             $running = 0;
             $idle = 0;
             $lastEnd = null;
 
             foreach ($stationJobs as $job) {
-                $start = strtotime($job['start']);
-                $end = strtotime($job['end']);
+                $start = strtotime($job['start'].' UTC');
+                $end = strtotime($job['end'].' UTC');
                 if ($end < $start) {
                     continue;
                 }
                 $duration = ($end - $start) / 60;
-                if ($lastEnd !== null && $start > $lastEnd && ($start - $lastEnd) < 43200 && date('Y-m-d', $lastEnd) === substr($job['start'], 0, 10)) {
+                $day = substr($job['start'], 0, 10);
+                $onTimeline = $timelineDate === null || $day === $timelineDate;
+                if ($lastEnd !== null && $start > $lastEnd && ($start - $lastEnd) < 43200 && gmdate('Y-m-d', $lastEnd) === $day) {
                     $gap = ($start - $lastEnd) / 60;
                     $idle += $gap;
-                    $segments[] = ['station' => $station, 'status' => 'Idle', 'start' => date('Y-m-d\TH:i:s', $lastEnd), 'end' => $job['start'], 'minutes' => round($gap, 2)];
+                    $idleCount++;
+                    if ($onTimeline) {
+                        $segments[] = ['station' => $station, 'status' => 'Idle', 'start' => gmdate('Y-m-d\TH:i:s', $lastEnd), 'end' => $job['start'], 'minutes' => round($gap, 2)];
+                    }
                 }
                 $running += max(0, $end - max($start, $lastEnd ?? $start)) / 60;
-                $segments[] = ['station' => $station, 'status' => 'Running', 'start' => $job['start'], 'end' => $job['end'], 'minutes' => round($duration, 2), 'jobId' => $job['id']];
+                $runningCount++;
+                if ($onTimeline) {
+                    $segments[] = ['station' => $station, 'status' => 'Running', 'start' => $job['start'], 'end' => $job['end'], 'minutes' => round($duration, 2), 'jobId' => $job['id']];
+                }
                 $lastEnd = max($lastEnd ?? $end, $end);
             }
 
-            $standard = self::STANDARD_TIMES[$station] ?? null;
-            $expected = $standard === null ? null : count($stationJobs) * $standard;
+            $expected = 0;
+            $missingStandard = false;
+            foreach ($stationJobs as $job) {
+                $day = substr($job['start'], 0, 10);
+                $jobStandard = $parameters[$day]['standard'] ?? null;
+                $missingStandard = $missingStandard || $jobStandard === null;
+                $expected += $jobStandard ?? 0;
+            }
+            $expected = $missingStandard || ($stationJobs === [] && $standard === null) ? null : round($expected, 4);
             $rows[] = [
                 'station' => $station, 'cycles' => count($stationJobs),
                 'quantity' => array_sum(array_column($stationJobs, 'quantity')),
                 'missingQuantity' => count(array_filter($stationJobs, fn (array $job): bool => $job['quantity'] === null)),
-                'running' => round($running, 2), 'idle' => round($idle, 2), 'available' => 435,
-                'efficiency' => $stationJobs === [] ? null : round($running / 435 * 100, 1),
+                'running' => round($running, 2), 'idle' => round($idle, 2), 'available' => $dailyMinutes,
+                'efficiency' => $stationJobs === [] || $dailyMinutes === 0 ? null : round($running / $dailyMinutes * 100, 1),
                 'availability' => $running + $idle > 0 ? round($running / ($running + $idle) * 100, 1) : null,
                 'performance' => $running > 0 && $expected !== null ? round($expected / $running * 100, 1) : null,
                 'standard' => $standard, 'expected' => $expected,
+                'standardVaries' => count($standards) > 1,
             ];
         }
 
         $running = array_sum(array_column($rows, 'running'));
         $idle = array_sum(array_column($rows, 'idle'));
-        $available = count($stations) * 435;
+        $available = array_sum(array_column($rows, 'available'));
         $expected = array_sum(array_column($rows, 'expected'));
-        $hasMissingStandard = count(array_filter($rows, fn (array $row): bool => $row['cycles'] > 0 && $row['standard'] === null)) > 0;
+        $hasMissingStandard = count(array_filter($rows, fn (array $row): bool => $row['expected'] === null && ($row['cycles'] > 0 || $jobs === []))) > 0;
 
         return [
             'rows' => $rows, 'segments' => $segments, 'cycles' => count($jobs),
+            'runningCount' => $runningCount, 'idleCount' => $idleCount,
+            'usesCustomSettings' => $usesCustomSettings,
             'quantity' => array_sum(array_column($rows, 'quantity')),
             'missingQuantity' => array_sum(array_column($rows, 'missingQuantity')),
             'running' => round($running, 1), 'idle' => round($idle, 1), 'available' => $available,

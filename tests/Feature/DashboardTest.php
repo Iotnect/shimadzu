@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use App\Services\ProductionDashboard;
+use App\Services\StationSettings;
 use Tests\TestCase;
 
 class DashboardTest extends TestCase
@@ -12,7 +13,7 @@ class DashboardTest extends TestCase
     {
         $this->useJobs($this->jobs());
 
-        $this->get('/')->assertOk()->assertViewIs('dashboard')->assertSee('Production overview')->assertSee('Station activity');
+        $this->get('/')->assertOk()->assertViewIs('dashboard')->assertSee('DET cycle timeline')->assertSee('Station · Working Time');
     }
 
     public function test_daily_totals_scale_capacity_by_station_and_preserve_source_quantity(): void
@@ -39,13 +40,13 @@ class DashboardTest extends TestCase
             ->assertOk()
             ->assertViewIs('dashboard')
             ->assertViewHas('stationPage', 'St1')
-            ->assertSee('Station 1')
+            ->assertSee('DET cycle timeline · St1')
             ->assertSee('Open metric guide')
             ->assertSee('View all stations');
 
         $this->assertSame('St1', $response['dashboard']['station']);
         $this->assertSame(2, $response['dashboard']['summary']['cycles']);
-        $this->assertSame(435, $response['dashboard']['summary']['available']);
+        $this->assertEquals(435, $response['dashboard']['summary']['available']);
         $this->assertSame(['St1'], array_unique(array_column($response['dashboard']['jobs'], 'station')));
     }
 
@@ -180,7 +181,10 @@ class DashboardTest extends TestCase
 
         $this->app->instance(ProductionDashboard::class, new class($jobs) extends ProductionDashboard
         {
-            public function __construct(private array $jobs) {}
+            public function __construct(private array $jobs)
+            {
+                parent::__construct(app(StationSettings::class));
+            }
 
             public function snapshot(): array
             {

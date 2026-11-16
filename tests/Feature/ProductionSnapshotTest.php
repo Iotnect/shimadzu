@@ -41,6 +41,34 @@ class ProductionSnapshotTest extends TestCase
         Http::assertSentCount(1);
     }
 
+    public function test_the_bundled_snapshot_loads_when_runtime_storage_is_relocated(): void
+    {
+        Storage::fake('local');
+        Storage::disk('local')->put('deployment/storage/app/private/det-worklog.json', json_encode($this->snapshot(), JSON_THROW_ON_ERROR));
+        $basePath = $this->app->basePath();
+        $storagePath = $this->app->storagePath();
+
+        try {
+            $this->app->setBasePath(Storage::disk('local')->path('deployment'));
+            $this->app->useStoragePath(Storage::disk('local')->path('runtime'));
+            config(['production' => require $basePath.'/config/production.php']);
+        } finally {
+            $this->app->setBasePath($basePath);
+            $this->app->useStoragePath($storagePath);
+        }
+
+        $this->actingAs(User::factory()->make())->getJson('/dashboard/data?date=2026-05-26')
+            ->assertOk()->assertJsonPath('source.isDemo', false)->assertJsonPath('source.name', 'fixture.xlsx')
+            ->assertJsonPath('summary.quantity', 2);
+    }
+
+    public function test_the_private_snapshot_cannot_be_downloaded(): void
+    {
+        $this->actingAs(User::factory()->make())->get('/storage/app/private/det-worklog.json')->assertForbidden();
+        $this->get('/storage/det-worklog.json')->assertForbidden();
+        $this->get('/det-worklog.json')->assertNotFound();
+    }
+
     public function test_a_signed_snapshot_url_can_be_used_without_a_bearer_token(): void
     {
         config(['production.worklog_url' => 'https://storage.example.test/snapshot.json?signature=example']);

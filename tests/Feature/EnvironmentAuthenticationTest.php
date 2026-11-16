@@ -14,8 +14,7 @@ class EnvironmentAuthenticationTest extends TestCase
 
         config([
             'auth.providers.users.driver' => 'environment',
-            'auth.providers.users.demo' => false,
-            'auth.providers.users.username' => 'admin',
+            'auth.providers.users.email' => 'admin@example.com',
             'auth.providers.users.password_hash' => Hash::make('private-admin-password'),
             'session.driver' => 'cookie',
             'cache.default' => 'array',
@@ -30,29 +29,30 @@ class EnvironmentAuthenticationTest extends TestCase
         $this->get('/')->assertRedirect(route('login'));
     }
 
-    public function test_demo_credentials_open_a_working_file_based_dashboard_without_a_database(): void
+    public function test_demo_data_requires_configured_credentials(): void
     {
         config([
-            'auth.providers.users.demo' => true,
-            'auth.providers.users.password_hash' => '',
             'production.demo_mode' => true,
             'production.worklog_url' => null,
             'production.worklog_path' => storage_path('testing/missing-demo-source.json'),
         ]);
         Auth::forgetGuards();
 
-        $this->post('/login', ['username' => 'admin', 'password' => 'admin123'])->assertRedirect(route('dashboard'));
+        $this->post('/login', ['username' => 'admin', 'password' => 'admin123'])->assertSessionHasErrors('email');
+        $this->assertGuest();
+
+        $this->post('/login', ['email' => 'admin@example.com', 'password' => 'private-admin-password'])->assertRedirect(route('dashboard'));
         $this->assertAuthenticated();
 
         $this->get('/')->assertOk()->assertSee('Demo workspace');
         $this->getJson('/dashboard/data?date=2026-05-26')
             ->assertOk()->assertJsonPath('source.isDemo', true)->assertJsonCount(4, 'summary.rows')->assertJsonCount(24, 'jobs');
-        $this->get('/stations/St1')->assertOk()->assertSee('Station 1');
+        $this->get('/stations/St1')->assertOk()->assertSee('DET cycle timeline · St1');
     }
 
     public function test_configured_credentials_create_a_session_without_a_database(): void
     {
-        $response = $this->post('/login', ['username' => 'ADMIN', 'password' => 'private-admin-password']);
+        $response = $this->post('/login', ['email' => 'ADMIN@EXAMPLE.COM', 'password' => 'private-admin-password']);
 
         $response->assertRedirect(route('dashboard'));
         $this->assertAuthenticated();
@@ -71,15 +71,15 @@ class EnvironmentAuthenticationTest extends TestCase
 
     public function test_incorrect_passwords_are_rejected_without_querying_a_database(): void
     {
-        $this->from('/login')->post('/login', ['username' => 'admin', 'password' => 'wrong-password'])
-            ->assertRedirect('/login')->assertSessionHasErrors('username')->assertSessionMissing('_old_input.password');
+        $this->from('/login')->post('/login', ['email' => 'admin@example.com', 'password' => 'wrong-password'])
+            ->assertRedirect('/login')->assertSessionHasErrors('email')->assertSessionMissing('_old_input.password');
 
         $this->assertGuest();
     }
 
     public function test_signing_out_the_configured_admin_ends_the_session_without_a_database(): void
     {
-        $this->post('/login', ['username' => 'admin', 'password' => 'private-admin-password'])
+        $this->post('/login', ['email' => 'admin@example.com', 'password' => 'private-admin-password'])
             ->assertRedirect(route('dashboard'));
 
         $this->post('/logout')->assertRedirect(route('login'));
@@ -94,28 +94,28 @@ class EnvironmentAuthenticationTest extends TestCase
         config(['auth.providers.users.password_hash' => '']);
         Auth::forgetGuards();
 
-        $this->post('/login', ['username' => 'admin', 'password' => 'private-admin-password'])->assertSessionHasErrors('username');
+        $this->post('/login', ['email' => 'admin@example.com', 'password' => 'private-admin-password'])->assertSessionHasErrors('email');
 
         $this->assertGuest();
     }
 
-    public function test_unknown_usernames_are_rejected(): void
+    public function test_unknown_emails_are_rejected(): void
     {
-        $this->post('/login', ['username' => 'other', 'password' => 'private-admin-password'])->assertSessionHasErrors('username');
+        $this->post('/login', ['email' => 'other@example.com', 'password' => 'private-admin-password'])->assertSessionHasErrors('email');
 
         $this->assertGuest();
     }
 
     public function test_stateless_login_does_not_issue_a_remember_token(): void
     {
-        $this->post('/login', ['username' => 'admin', 'password' => 'private-admin-password', 'remember' => '1'])
+        $this->post('/login', ['email' => 'admin@example.com', 'password' => 'private-admin-password', 'remember' => '1'])
             ->assertRedirect(route('dashboard'))->assertCookieMissing(Auth::guard()->getRecallerName());
     }
 
     public function test_changing_the_configured_password_invalidates_the_old_account_identifier(): void
     {
         $provider = Auth::createUserProvider('users');
-        $user = $provider->retrieveByCredentials(['username' => 'admin']);
+        $user = $provider->retrieveByCredentials(['email' => 'admin@example.com']);
         config(['auth.providers.users.password_hash' => Hash::make('new-admin-password')]);
 
         $this->assertNull(Auth::createUserProvider('users')->retrieveById($user->getAuthIdentifier()));
@@ -124,11 +124,11 @@ class EnvironmentAuthenticationTest extends TestCase
     public function test_repeated_invalid_logins_are_still_throttled(): void
     {
         for ($attempt = 0; $attempt < 5; $attempt++) {
-            $this->post('/login', ['username' => 'admin', 'password' => 'wrong-password']);
+            $this->post('/login', ['email' => 'admin@example.com', 'password' => 'wrong-password']);
         }
 
-        $this->post('/login', ['username' => 'admin', 'password' => 'wrong-password'])
-            ->assertSessionHasErrors(['username' => 'Too many sign-in attempts. Please try again in one minute.']);
+        $this->post('/login', ['email' => 'admin@example.com', 'password' => 'wrong-password'])
+            ->assertSessionHasErrors(['email' => 'Too many sign-in attempts. Please try again in one minute.']);
     }
 
     public function test_an_admin_hash_can_be_generated_without_a_database(): void

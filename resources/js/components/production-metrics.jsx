@@ -1,40 +1,32 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import { Activity, Clock3, TrendingUp, Package, ArrowDownRight, ArrowUpRight, Minus } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { Badge } from './ui/badge';
 
-const number = (value, digits = 0) => Number(value).toLocaleString('en-GB', { minimumFractionDigits: digits, maximumFractionDigits: digits });
+const number = (value, digits = 0, maximumDigits = digits) => Number(value).toLocaleString('en-GB', { minimumFractionDigits: digits, maximumFractionDigits: maximumDigits });
 let root;
 
-export function renderProductionMetrics(data) {
-    const { summary, previous } = data;
+export function renderProductionMetrics({ summary, previous }) {
     const metrics = [
-        { key: 'efficiency', label: 'Efficiency', icon: Activity, context: 'Running time / available time' },
-        { key: 'availability', label: 'Availability', icon: Clock3, context: 'Running time / recorded time' },
-        { key: 'performance', label: 'Performance', icon: TrendingUp, context: 'Expected time / running time' },
-        { key: 'cycles', label: 'Logged cycles', icon: Package, context: `${number(summary.quantity)} units recorded${summary.missingQuantity ? ' · incomplete qty' : ''}` },
+        { key: 'efficiency', label: 'Efficiency % by Station', formula: 'Running / Working Hour', name: 'Efficiency', rate: true },
+        { key: 'availability', label: 'Availability %', formula: 'Running / (Running + Idle)', name: 'Availability', rate: true },
+        { key: 'performance', label: 'Performance %', formula: 'Std Time / Running', name: 'Performance', rate: true },
+        { key: 'running', label: 'Total Running (Min)' },
+        { key: 'idle', label: 'Total Idle (Min)' },
+        { key: 'available', label: 'Working Hour (Min)' },
+        { key: 'cycles', label: 'Total Qty' },
     ];
     root ??= createRoot(document.querySelector('#kpi-grid'));
-    root.render(metrics.map(({ key, label, icon: Icon, context }) => {
-        const value = summary[key];
-        const isCycles = key === 'cycles';
-        const canCompare = value !== null && previous && previous[key] !== null;
-        const difference = canCompare ? value - previous[key] : null;
-        const Trend = difference > 0 ? ArrowUpRight : difference < 0 ? ArrowDownRight : Minus;
-        return <Card key={key} className="metric-card gap-4 py-5">
-            <CardHeader className="flex items-center justify-between px-5">
-                <CardTitle className="text-sm font-medium text-muted-foreground"><h2 className="text-sm font-medium text-muted-foreground">{label}</h2></CardTitle>
-                <Icon className="size-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent className="flex flex-1 flex-col gap-3 px-5">
-                <div className="flex items-baseline gap-1.5 text-4xl font-semibold tracking-tight tabular-nums">{value === null ? '—' : number(value, isCycles ? 0 : 1)}<span className="text-base font-normal text-muted-foreground">{isCycles ? 'cycles' : '%'}</span></div>
-                <CardDescription className="text-xs leading-relaxed">{value === null ? (summary.cycles ? 'Standard time not configured' : 'No activity on this date') : context}</CardDescription>
-                <div className="mt-auto flex flex-wrap items-center gap-2 pt-2 text-xs text-muted-foreground">
-                    <Badge variant="outline" className={difference > 0 ? 'metric-up' : difference < 0 ? 'metric-down' : ''}><Trend className="size-3" />{difference === null ? 'No comparison' : `${number(Math.abs(difference), isCycles ? 0 : 1)}${isCycles ? '' : ' pp'}`}</Badge>
-                    <span>{canCompare ? `vs ${new Date(`${previous.date}T12:00:00`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}` : 'Previous available day'}</span>
-                </div>
-            </CardContent>
-        </Card>;
+    root.render(metrics.map(({ key, label, formula, name, rate }) => {
+        const digits = key === 'cycles' || key === 'available' ? 0 : 1;
+        const value = summary[key] === null ? 'N/A' : number(summary[key], digits, key === 'available' ? 4 : digits);
+        const valueClass = value.length >= 11 ? 'report-metric-value-wide' : value.length >= 8 ? 'report-metric-value-long' : undefined;
+        const difference = previous && summary[key] !== null && previous[key] !== null ? summary[key] - previous[key] : null;
+        return <div className="report-metric-cell" key={key}>
+        <article className={`report-metric report-metric-${key}`} title={key === 'cycles' ? 'Count of Running records (cycles), as in Power BI' : label}>
+            <h2>{label}</h2>
+            <strong className={valueClass}>{value}{rate && summary[key] !== null && <span>%</span>}</strong>
+            <small className="report-trend">{difference === null ? 'No comparison' : `${difference > 0 ? '+' : ''}${number(difference, key === 'cycles' ? 0 : 1)} ${rate ? 'pp' : key === 'cycles' ? 'cycles' : 'min'} vs ${new Date(`${previous.date}T12:00:00`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}`}</small>
+        </article>
+        {formula && <div className="report-formula"><strong>{name}:</strong><span>{formula}</span></div>}
+    </div>;
     }));
 }

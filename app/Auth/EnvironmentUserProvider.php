@@ -10,9 +10,7 @@ use SensitiveParameter;
 
 class EnvironmentUserProvider implements UserProvider
 {
-    public const DEMO_PASSWORD_HASH = '$2y$12$g4.HyJWKUly61h4GrfsNKeKFEYmQgUvRWKp4cskUjTJ2ge17BjHWK';
-
-    public function __construct(private string $username, #[SensitiveParameter] private string $passwordHash) {}
+    public function __construct(private string $email, #[SensitiveParameter] private string $passwordHash) {}
 
     public function retrieveById(mixed $identifier): ?Authenticatable
     {
@@ -32,9 +30,9 @@ class EnvironmentUserProvider implements UserProvider
     /** @param array<string, mixed> $credentials */
     public function retrieveByCredentials(#[SensitiveParameter] array $credentials): ?Authenticatable
     {
-        $username = $credentials['username'] ?? null;
+        $email = $credentials['email'] ?? null;
 
-        return is_string($username) && hash_equals($this->username, mb_strtolower($username)) ? $this->user() : null;
+        return is_string($email) && hash_equals($this->email, mb_strtolower($email)) ? $this->user() : null;
     }
 
     /** @param array<string, mixed> $credentials */
@@ -54,14 +52,14 @@ class EnvironmentUserProvider implements UserProvider
 
     private function user(): ?GenericUser
     {
-        if ($this->username === '' || password_get_info($this->passwordHash)['algo'] === null) {
+        if ($this->email === '' || password_get_info($this->passwordHash)['algo'] === null) {
             return null;
         }
 
         return new GenericUser([
-            'id' => hash('sha256', $this->username.'|'.$this->passwordHash),
+            'id' => hash('sha256', $this->email.'|'.$this->passwordHash),
             'name' => 'Administrator',
-            'username' => $this->username,
+            'email' => $this->email,
             'password' => $this->passwordHash,
             'remember_token' => null,
         ]);

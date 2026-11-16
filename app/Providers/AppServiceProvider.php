@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use App\Auth\EnvironmentUserProvider;
+use App\Models\User;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Http\Request;
@@ -26,17 +28,22 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Auth::provider('environment', fn (Application $app, array $config): EnvironmentUserProvider => new EnvironmentUserProvider(
-            ($config['demo'] ?? false) ? 'admin' : (string) $config['username'],
-            ($config['demo'] ?? false) ? EnvironmentUserProvider::DEMO_PASSWORD_HASH : (string) $config['password_hash'],
+            (string) $config['email'],
+            (string) $config['password_hash'],
         ));
 
+        ResetPassword::createUrlUsing(fn (User $user, string $token): string => rtrim(config('app.url'), '/').route('password.reset', [
+            'token' => $token,
+            'email' => $user->getEmailForPasswordReset(),
+        ], absolute: false));
+
         RateLimiter::for('login', function (Request $request): Limit {
-            $username = $request->input('username');
+            $email = $request->input('email');
 
             return Limit::perMinute(5)
-                ->by(hash('sha256', (is_string($username) ? mb_strtolower($username) : '').'|'.$request->ip()))
+                ->by(hash('sha256', (is_string($email) ? mb_strtolower($email) : '').'|'.$request->ip()))
                 ->response(fn () => redirect()->route('login')->withErrors([
-                    'username' => 'Too many sign-in attempts. Please try again in one minute.',
+                    'email' => 'Too many sign-in attempts. Please try again in one minute.',
                 ]));
         });
     }

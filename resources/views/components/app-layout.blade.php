@@ -1,4 +1,4 @@
-@props(['title' => 'Production dashboard'])
+@props(['title' => 'Production dashboard', 'showMetricGuide' => true])
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -60,7 +60,7 @@
         <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
         <div class="main-shell">
-            <header class="topbar"><div class="breadcrumb"><button class="icon-button mobile-menu" aria-label="Open navigation" aria-expanded="false" id="menu-toggle"><x-icon name="menu" /></button><span>{{ request()->routeIs('settings') ? 'Management' : 'Workspace' }}</span><x-icon name="arrow" /><strong>{{ $title }}</strong></div><div class="topbar-right">@if(request()->routeIs('dashboard', 'stations.show', 'sensors.show'))<button class="icon-button" aria-label="Open metric guide" data-dialog="method"><x-icon name="help" /></button>@endif</div></header>
+            <header class="topbar"><div class="breadcrumb"><button class="icon-button mobile-menu" aria-label="Open navigation" aria-expanded="false" id="menu-toggle"><x-icon name="menu" /></button><span>{{ request()->routeIs('settings') ? 'Management' : 'Workspace' }}</span><x-icon name="arrow" /><strong>{{ $title }}</strong></div><div class="topbar-right">@if($showMetricGuide && request()->routeIs('dashboard', 'stations.show', 'sensors.show'))<button class="icon-button" aria-label="Open metric guide" data-dialog="method"><x-icon name="help" /></button>@endif</div></header>
             <main id="main">{{ $slot }}</main>
         </div>
     </div>

@@ -141,6 +141,19 @@ class ProductionSnapshotTest extends TestCase
         $this->actingAs(User::factory()->make())->getJson('/dashboard/data?date=2026-05-26')->assertServiceUnavailable();
     }
 
+    public function test_a_missing_worklog_keeps_the_workspace_navigation_available(): void
+    {
+        Storage::fake('local');
+        config(['production.worklog_path' => Storage::disk('local')->path('missing.json')]);
+
+        $this->actingAs(User::factory()->make())->get('/')
+            ->assertServiceUnavailable()
+            ->assertSee('Production worklog unavailable')
+            ->assertSee('Settings')
+            ->assertSee('Sign out')
+            ->assertDontSee('Open metric guide');
+    }
+
     /** @return array<string, mixed> */
     private function snapshot(): array
     {

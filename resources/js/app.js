@@ -72,7 +72,7 @@ function renderDistribution() {
 
 function renderStations() {
     const canSelect = window.detSensorPage && !window.detStationPage;
-    $('#station-rows').innerHTML = state.data.summary.rows.map((row) => `<tr><td><span class="station-name">${escape(row.station)}</span></td><td><div class="efficiency-cell"><span>${percent(row.efficiency)}</span><div class="efficiency-track"><i style="width:${Math.min(100, row.efficiency ?? 0)}%"></i></div></div></td><td>${number(row.running)} <small>min</small></td><td>${number(row.idle)} <small>min</small></td><td>${row.cycles}</td><td>${canSelect ? `<button class="icon-button" data-station="${escape(row.station)}" aria-label="Explore ${escape(row.station)}">${icon('arrow')}</button>` : ''}</td></tr>`).join('');
+    $('#station-rows').innerHTML = state.data.summary.rows.map((row) => `<tr><td><button type="button" class="station-name station-select" data-detail-station="${escape(row.station)}" aria-pressed="${state.detailStation === row.station}" aria-controls="running-count idle-count standard-time total-standard-time">${escape(row.station)}</button></td><td><div class="efficiency-cell"><span>${percent(row.efficiency)}</span><div class="efficiency-track"><i style="width:${Math.min(100, row.efficiency ?? 0)}%"></i></div></div></td><td>${number(row.running)} <small>min</small></td><td>${number(row.idle)} <small>min</small></td><td>${row.cycles}</td><td>${canSelect ? `<button class="icon-button" data-station="${escape(row.station)}" aria-label="Explore ${escape(row.station)}">${icon('arrow')}</button>` : ''}</td></tr>`).join('');
 }
 
 function renderStationDetails() {

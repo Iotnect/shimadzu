@@ -187,6 +187,11 @@ td { color: var(--ink); font-size: 13px; border-color: var(--line); padding-top:
 tbody tr:hover { background: var(--surface-subtle); }
 .station-table td { padding-top: 16px; padding-bottom: 16px; }
 .station-name { color: var(--ink); font-size: 13px; }
+.station-select { display: inline-flex; justify-content: center; min-width: 54px; min-height: 44px; padding: 6px 10px; border: 1px solid var(--control-line); border-radius: 4px; background: var(--surface); color: var(--brand-ink); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.station-select:hover { background: var(--surface-hover); text-decoration-thickness: 2px; }
+.station-select:active { background: var(--surface-subtle); }
+.station-select[aria-pressed="true"] { border-color: var(--ink); background: var(--surface-hover); font-weight: 700; }
+.station-select:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
 .efficiency-cell span { color: var(--ink); font-size: 13px; width: 48px; }
 .efficiency-track { background: var(--line); height: 5px; width: 70px; box-shadow: none; }
 .efficiency-track i { background: var(--chart-running); }

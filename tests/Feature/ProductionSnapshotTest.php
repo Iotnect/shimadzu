@@ -41,6 +41,77 @@ class ProductionSnapshotTest extends TestCase
         Http::assertSentCount(1);
     }
 
+    public function test_the_dashboard_selects_lines_from_the_remote_workbook_catalog(): void
+    {
+        $origin = 'https://worklogs.example.test';
+        $generation = '92f3238d-c0d9-4979-9f09-c80303270a40';
+        config(['production.worklog_origin_url' => $origin, 'production.worklog_origin_token' => 'origin-test-token']);
+        Http::fake([
+            $origin.'/index.json' => Http::response(['generation' => $generation, 'sensors' => ['lc2kdet', 'aoc']]),
+            $origin.'/'.$generation.'/lc2kdet.json' => Http::response($this->snapshot()),
+            $origin.'/'.$generation.'/aoc.json' => Http::response(array_replace($this->snapshot(), ['worksheet' => 'aoc_worklog'])),
+        ]);
+
+        $this->actingAs(User::factory()->make())
+            ->getJson('/dashboard/data?date=2026-05-26')
+            ->assertOk()->assertJsonPath('sensors', ['lc2kdet', 'aoc'])->assertJsonPath('sensor', 'lc2kdet');
+        $this->getJson('/sensors/aoc/data?date=2026-05-26')
+            ->assertOk()->assertJsonPath('sensor', 'aoc')->assertJsonPath('source.worksheet', 'aoc_worklog');
+
+        Http::assertSent(fn (Request $request): bool => $request->url() === $origin.'/'.$generation.'/aoc.json'
+            && $request->hasHeader('Authorization', 'Bearer origin-test-token'));
+    }
+
+    public function test_an_insecure_worklog_origin_is_rejected_without_sending_credentials(): void
+    {
+        config(['production.worklog_origin_url' => 'http://worklogs.example.test', 'production.worklog_origin_token' => 'origin-test-token']);
+        Http::fake();
+
+        $this->actingAs(User::factory()->make())->getJson('/dashboard/data')
+            ->assertServiceUnavailable()->assertJsonPath('message', 'Production data is temporarily unavailable.');
+
+        Http::assertNothingSent();
+    }
+
+    public function test_a_worklog_origin_without_a_token_does_not_send_a_request(): void
+    {
+        config(['production.worklog_origin_url' => 'https://worklogs.example.test', 'production.worklog_origin_token' => null]);
+        Http::fake();
+
+        $this->actingAs(User::factory()->make())->getJson('/dashboard/data')->assertServiceUnavailable();
+
+        Http::assertNothingSent();
+    }
+
+    public function test_a_rejected_worklog_origin_response_does_not_expose_private_details(): void
+    {
+        config(['production.worklog_origin_url' => 'https://worklogs.example.test', 'production.worklog_origin_token' => 'origin-test-token']);
+        Http::fake(['https://worklogs.example.test/index.json' => Http::response('Private upstream error', 401)]);
+
+        $this->actingAs(User::factory()->make())->getJson('/dashboard/data')
+            ->assertServiceUnavailable()->assertJsonPath('message', 'Production data is temporarily unavailable.')
+            ->assertDontSee('Private upstream error')->assertDontSee('origin-test-token');
+    }
+
+    public function test_a_worklog_origin_redirect_is_not_followed(): void
+    {
+        config(['production.worklog_origin_url' => 'https://worklogs.example.test', 'production.worklog_origin_token' => 'origin-test-token']);
+        Http::fake(['https://worklogs.example.test/index.json' => Http::response('', 302, ['Location' => 'https://other.example.test/index.json'])]);
+
+        $this->actingAs(User::factory()->make())->getJson('/dashboard/data')->assertServiceUnavailable();
+
+        Http::assertSentCount(1);
+    }
+
+    public function test_a_worklog_origin_connection_failure_returns_503(): void
+    {
+        config(['production.worklog_origin_url' => 'https://worklogs.example.test', 'production.worklog_origin_token' => 'origin-test-token']);
+        Http::fake(['https://worklogs.example.test/index.json' => Http::failedConnection()]);
+
+        $this->actingAs(User::factory()->make())->getJson('/dashboard/data')
+            ->assertServiceUnavailable()->assertJsonPath('message', 'Production data is temporarily unavailable.');
+    }
+
     public function test_the_bundled_snapshot_loads_when_runtime_storage_is_relocated(): void
     {
         Storage::fake('local');

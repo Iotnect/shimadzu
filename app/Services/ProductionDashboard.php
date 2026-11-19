@@ -31,12 +31,15 @@ class ProductionDashboard
         }
 
         $directory = config('production.sensor_worklog_directory');
+        $origin = $this->worklogOrigin();
         $path = $directory.'/index.json';
-        if (! is_string($directory) || $directory === '' || ! is_file($path)) {
+        if ($origin === null && (! is_string($directory) || $directory === '' || ! is_file($path))) {
             return $this->sensorCatalog = ['generation' => '', 'sensors' => [self::DEFAULT_SENSOR]];
         }
 
-        $catalog = json_decode(file_get_contents($path), true);
+        $catalog = json_decode($origin !== null
+            ? $this->fetchOriginFile($origin, 'index.json')
+            : file_get_contents($path), true);
         abort_unless(
             is_string($catalog['generation'] ?? null)
             && preg_match('/^[a-f0-9-]{36}$/D', $catalog['generation'])
@@ -123,10 +126,48 @@ class ProductionDashboard
             return $this->snapshot();
         }
 
-        $path = config('production.sensor_worklog_directory').'/'.$catalog['generation'].'/'.$sensor.'.json';
+        $file = $catalog['generation'].'/'.$sensor.'.json';
+        $origin = $this->worklogOrigin();
+        if ($origin !== null) {
+            $key = 'line-worklog:'.hash('sha256', $origin.'|'.config('production.worklog_origin_token').'|'.$file);
+
+            return Cache::remember($key, 300, fn (): array => $this->decodeSnapshot($this->fetchOriginFile($origin, $file)));
+        }
+
+        $path = config('production.sensor_worklog_directory').'/'.$file;
         abort_unless(is_readable($path), 503, 'Production data is temporarily unavailable.');
 
         return $this->decodeSnapshot(file_get_contents($path));
+    }
+
+    private function worklogOrigin(): ?string
+    {
+        $url = config('production.worklog_origin_url');
+
+        return is_string($url) && $url !== '' ? rtrim($url, '/') : null;
+    }
+
+    private function fetchOriginFile(string $origin, string $file): string
+    {
+        $token = config('production.worklog_origin_token');
+        abort_unless(
+            filter_var($origin, FILTER_VALIDATE_URL)
+            && parse_url($origin, PHP_URL_SCHEME) === 'https'
+            && is_string($token) && $token !== '',
+            503,
+            'Production data is temporarily unavailable.',
+        );
+
+        try {
+            $response = Http::acceptJson()->withToken($token)->connectTimeout(3)->timeout(15)
+                ->withoutRedirecting()->get($origin.'/'.$file);
+        } catch (ConnectionException $exception) {
+            abort(503, 'Production data is temporarily unavailable.');
+        }
+
+        abort_unless($response->successful(), 503, 'Production data is temporarily unavailable.');
+
+        return $response->body();
     }
 
     /** @return list<string> */

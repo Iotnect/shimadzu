@@ -227,6 +227,8 @@ class ProductionDashboard
             usort($stationJobs, fn (array $left, array $right): int => [$left['start'], $left['id']] <=> [$right['start'], $right['id']]);
             $running = 0;
             $idle = 0;
+            $stationRunningCount = 0;
+            $stationIdleCount = 0;
             $lastEnd = null;
 
             foreach ($stationJobs as $job) {
@@ -242,12 +244,14 @@ class ProductionDashboard
                     $gap = ($start - $lastEnd) / 60;
                     $idle += $gap;
                     $idleCount++;
+                    $stationIdleCount++;
                     if ($onTimeline) {
                         $segments[] = ['station' => $station, 'status' => 'Idle', 'start' => gmdate('Y-m-d\TH:i:s', $lastEnd), 'end' => $job['start'], 'minutes' => round($gap, 2)];
                     }
                 }
                 $running += max(0, $end - max($start, $lastEnd ?? $start)) / 60;
                 $runningCount++;
+                $stationRunningCount++;
                 if ($onTimeline) {
                     $segments[] = ['station' => $station, 'status' => 'Running', 'start' => $job['start'], 'end' => $job['end'], 'minutes' => round($duration, 2), 'jobId' => $job['id']];
                 }
@@ -265,6 +269,7 @@ class ProductionDashboard
             $expected = $missingStandard || ($stationJobs === [] && $standard === null) ? null : round($expected, 4);
             $rows[] = [
                 'station' => $station, 'cycles' => count($stationJobs),
+                'runningCount' => $stationRunningCount, 'idleCount' => $stationIdleCount,
                 'quantity' => array_sum(array_column($stationJobs, 'quantity')),
                 'missingQuantity' => count(array_filter($stationJobs, fn (array $job): bool => $job['quantity'] === null)),
                 'running' => round($running, 2), 'idle' => round($idle, 2), 'available' => $dailyMinutes,

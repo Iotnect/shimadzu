@@ -61,6 +61,8 @@ class SensorWorklogTest extends TestCase
         $this->getJson('/sensors/aoc/data?from=2026-05-25&to=2026-05-27&date=2026-05-25')
             ->assertOk()->assertJsonPath('summary.cycles', 3)
             ->assertJsonPath('summary.running', 180)->assertJsonPath('date', '2026-05-25')
+            ->assertJsonPath('summary.rows.0.runningCount', 2)->assertJsonPath('summary.rows.0.idleCount', 1)
+            ->assertJsonPath('summary.rows.1.runningCount', 1)->assertJsonPath('summary.rows.1.idleCount', 0)
             ->assertJsonCount(3, 'summary.segments')
             ->assertJsonPath('summary.segments.0.start', '2026-05-25T09:00:00');
     }

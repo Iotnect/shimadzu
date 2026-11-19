@@ -33,10 +33,10 @@
                 </section>
 
                 <div class="analysis-grid">
-                    <section class="panel status-count-panel" aria-label="Count of StartTimeOnly by Status"><dl><div><dt>Running</dt><dd id="running-count"></dd></div><div><dt>Idle</dt><dd id="idle-count"></dd></div></dl></section>
+                    <section class="panel status-count-panel" aria-label="Count of StartTimeOnly by Status"><dl><div><dt><span class="detail-scope" data-detail-scope></span>Running</dt><dd id="running-count"></dd></div><div><dt>Idle</dt><dd id="idle-count"></dd></div></dl></section>
                     <section class="panel place-panel" id="place-slicer" aria-label="Place"></section>
                     <section class="panel duration-panel"><div class="panel-heading"><div><h2>Sum of DurationMin by Status</h2><p>Running and Idle for the selected WorkDate.</p></div></div><div id="duration-chart"></div></section>
-                    <section class="panel standard-panel"><dl class="standard-metrics"><div><dt>St Std Time (Min)</dt><dd id="standard-time"></dd></div><div><dt>Total Std Time (Min)</dt><dd id="total-standard-time"></dd></div></dl></section>
+                    <section class="panel standard-panel"><dl class="standard-metrics"><div><dt><span class="detail-scope" data-detail-scope></span>St Std Time (Min)</dt><dd id="standard-time"></dd></div><div><dt>Total Std Time (Min)</dt><dd id="total-standard-time"></dd></div></dl></section>
                     <section class="panel distribution-panel"><div class="panel-heading"><div><h2>Sum of DurationMin by Status</h2><p>Share of Running and Idle time.</p></div></div><div class="distribution-body" id="distribution"></div><div class="distribution-foot"><x-icon name="clock" /><span>Duration (min) · Running / (Running + Idle)</span></div></section>
                     <section id="stations" class="panel station-panel">
                         <div class="panel-heading">

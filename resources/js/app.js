@@ -13,7 +13,7 @@ const percent = (value) => value === null ? 'N/A' : `${number(value, 1)}%`;
 const dayLabel = (date, options = {}) => new Date(`${date}T12:00:00`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', ...options });
 const timeLabel = (date) => date.slice(11, 16);
 const duration = (start, end) => (new Date(end) - new Date(start)) / 60000;
-const state = { data: window.detDashboard, page: 1, search: '', controller: null };
+const state = { data: window.detDashboard, page: 1, search: '', controller: null, detailStation: null };
 let defaultRange = !new URLSearchParams(window.location.search).has('from');
 let toastTimer;
 
@@ -59,7 +59,7 @@ function renderTimeline() {
             const end = Math.min(endMinute, minuteOffset(segment.end));
             return `<button class="interval ${segment.status.toLowerCase()}" style="left:${position(minuteOffset(segment.start))}%;width:${Math.max(.12, (end - minuteOffset(segment.start)) / span * 100)}%" title="${label}" aria-label="${label}" data-segment="${index}"></button>`;
         }).join('');
-        return `<div class="timeline-row"><div class="station-label"><div class="station-label-text"><strong>${escape(row.station)}</strong><small>Total Qty: ${row.cycles}</small></div></div><div class="track" style="background-image:linear-gradient(to right,var(--line) 1px,transparent 1px);background-size:${100 / hourCount}% 100%">${breakBands}${intervals || '<span class="timeline-empty">No recorded activity</span>'}</div></div>`;
+        return `<div class="timeline-row"><div class="station-label"><button type="button" class="station-label-text timeline-station" data-detail-station="${escape(row.station)}" aria-pressed="${state.detailStation === row.station}" aria-controls="running-count idle-count standard-time total-standard-time"><strong>${escape(row.station)}</strong><small>Total Qty: ${row.cycles}</small></button></div><div class="track" style="background-image:linear-gradient(to right,var(--line) 1px,transparent 1px);background-size:${100 / hourCount}% 100%">${breakBands}${intervals || '<span class="timeline-empty">No recorded activity</span>'}</div></div>`;
     }).join('')}<div class="break-labels">${breaks.map(([start, end, label]) => `<span class="break-label" style="left:${position((start + end) / 2)}%">${label}</span>`).join('')}</div>`;
 }
 
@@ -75,21 +75,36 @@ function renderStations() {
     $('#station-rows').innerHTML = state.data.summary.rows.map((row) => `<tr><td><span class="station-name">${escape(row.station)}</span></td><td><div class="efficiency-cell"><span>${percent(row.efficiency)}</span><div class="efficiency-track"><i style="width:${Math.min(100, row.efficiency ?? 0)}%"></i></div></div></td><td>${number(row.running)} <small>min</small></td><td>${number(row.idle)} <small>min</small></td><td>${row.cycles}</td><td>${canSelect ? `<button class="icon-button" data-station="${escape(row.station)}" aria-label="Explore ${escape(row.station)}">${icon('arrow')}</button>` : ''}</td></tr>`).join('');
 }
 
-function renderReportDetails() {
+function renderStationDetails() {
     const { summary } = state.data;
-    $('#running-count').textContent = summary.runningCount;
-    $('#idle-count').textContent = summary.idleCount;
-    const standard = summary.rows.length === 1 ? summary.rows[0].standard : null;
+    const selectedRow = summary.rows.find(row => row.station === state.detailStation);
+    const rows = selectedRow ? [selectedRow] : summary.rows;
+    const totals = selectedRow ?? summary;
+    const scope = selectedRow?.station ?? (state.data.station === 'all' ? 'All stations' : state.data.station);
+    $$('[data-detail-scope]').forEach(label => { label.textContent = scope; });
+    $$('[data-detail-station]').forEach(button => {
+        const selected = button.dataset.detailStation === state.detailStation;
+        button.setAttribute('aria-pressed', String(selected));
+        button.title = selected ? 'Show totals for all displayed stations' : `Show ${button.dataset.detailStation} counts and standard times`;
+    });
+    $('#running-count').textContent = totals.runningCount;
+    $('#idle-count').textContent = totals.idleCount;
+    const standard = rows.length === 1 ? rows[0].standard : null;
     let standardLabel = 'Not configured';
-    if (summary.rows.some(row => row.standardVaries)) {
+    if (rows.some(row => row.standardVaries)) {
         standardLabel = 'Varies over period';
     } else if (standard !== null) {
         standardLabel = `${number(standard, 4)} min`;
-    } else if (summary.rows.some(row => row.standard !== null)) {
+    } else if (rows.some(row => row.standard !== null)) {
         standardLabel = 'Varies by section';
     }
     $('#standard-time').textContent = standardLabel;
-    $('#total-standard-time').textContent = summary.expected === null ? 'Not configured' : `${number(summary.expected, 1)} min`;
+    $('#total-standard-time').textContent = totals.expected === null ? 'Not configured' : `${number(totals.expected, 1)} min`;
+}
+
+function renderReportDetails() {
+    renderStationDetails();
+    const { summary } = state.data;
     const maximum = Math.max(summary.running, summary.idle, 1);
     $('#duration-chart').innerHTML = `<div class="duration-columns" role="img" aria-label="Running ${number(summary.running, 1)} min, Idle ${number(summary.idle, 1)} min">${[['Running', summary.running], ['Idle', summary.idle]].map(([status, minutes]) => `<div class="duration-column"><strong>${number(minutes, 1)}</strong><div class="duration-bar ${status.toLowerCase()}" style="height:${minutes / maximum * 120}px"></div><span>${status}</span></div>`).join('')}</div><p class="duration-date">${periodLabel()} · Duration (min)</p>`;
 }
@@ -167,6 +182,7 @@ async function loadData(filters = {}, { useDefault = defaultRange } = {}) {
         const response = await fetch(`${window.detDataUrl}?${query}`, { signal: controller.signal, headers: { Accept: 'application/json' } });
         if (!response.ok) throw new Error('Unable to load these filters. Check the date range and try again.');
         state.data = await response.json();
+        state.detailStation = null;
         defaultRange = useDefault;
         state.page = 1;
         render();
@@ -284,6 +300,13 @@ $('#close-dialog').addEventListener('click', () => $('#detail-dialog').close());
 $('#detail-dialog').addEventListener('click', (event) => { if (event.target === $('#detail-dialog') && event.offsetX >= 0 && event.offsetY >= 0 && (event.offsetX > event.target.clientWidth || event.offsetY > event.target.clientHeight)) event.target.close(); });
 
 document.addEventListener('click', (event) => {
+    const detailStationButton = event.target.closest('[data-detail-station]');
+    if (detailStationButton) {
+        const station = detailStationButton.dataset.detailStation;
+        state.detailStation = state.detailStation === station ? null : station;
+        renderStationDetails();
+        $('#load-status').textContent = `Counts and standard times updated for ${state.detailStation ?? 'all displayed stations'}`;
+    }
     const dialogButton = event.target.closest('[data-dialog]');
     if (dialogButton) dialogButton.dataset.dialog === 'source' ? showSource() : showMethod();
     const jobButton = event.target.closest('[data-job]');

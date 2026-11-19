@@ -87,6 +87,8 @@ class DashboardTest extends TestCase
             ->assertOk()
             ->assertJsonCount(0, 'jobs')
             ->assertJsonPath('summary.cycles', 0)
+            ->assertJsonPath('summary.rows.0.runningCount', 0)
+            ->assertJsonPath('summary.rows.0.idleCount', 0)
             ->assertJsonPath('summary.efficiency', null);
     }
 
@@ -102,6 +104,22 @@ class DashboardTest extends TestCase
             ->assertJsonPath('summary.running', 90)
             ->assertJsonPath('summary.quantity', 2)
             ->assertJsonPath('summary.expected', 51);
+    }
+
+    public function test_station_details_include_separate_counts_and_standard_times(): void
+    {
+        $this->useJobs($this->jobs());
+
+        $this->getJson('/dashboard/data?date=2026-05-26')
+            ->assertOk()
+            ->assertJsonPath('summary.rows.0.station', 'St1')
+            ->assertJsonPath('summary.rows.0.runningCount', 2)
+            ->assertJsonPath('summary.rows.0.idleCount', 1)
+            ->assertJsonPath('summary.rows.0.standard', 25.515)
+            ->assertJsonPath('summary.rows.0.expected', 51.03)
+            ->assertJsonPath('summary.rows.1.station', 'St2')
+            ->assertJsonPath('summary.rows.1.runningCount', 1)
+            ->assertJsonPath('summary.rows.1.idleCount', 0);
     }
 
     public function test_date_without_jobs_returns_unavailable_rates_and_no_activity(): void

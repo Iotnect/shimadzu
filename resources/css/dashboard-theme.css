@@ -158,6 +158,12 @@ h2 { font-size: 17px; font-weight: 600; color: var(--ink); letter-spacing: -.3px
 .station-number { height: 30px; width: 30px; background: var(--surface-subtle); color: var(--muted); border: 1px solid var(--line); border-radius: 6px; box-shadow: none; }
 .station-label-text strong { font-size: 13px; color: var(--ink); }
 .station-label-text small { font-size: 11px; color: var(--muted); }
+.timeline-station { min-height: 44px; width: 100%; padding: 6px; border: 1px solid transparent; background: transparent; text-align: left; color: var(--ink); }
+.timeline-station:hover { background: var(--surface-hover); }
+.timeline-station:active { background: var(--surface-subtle); }
+.timeline-station[aria-pressed="true"] { border-color: var(--ink); background: var(--surface-hover); text-decoration: underline; text-underline-offset: 3px; }
+.timeline-station:focus-visible { outline: 2px solid var(--ink); outline-offset: -2px; }
+.detail-scope { display: block; margin-bottom: 4px; font-size: 11px; font-weight: 600; }
 .interval { top: 21px; height: 25px; border: 1px solid var(--surface); border-radius: 4px; box-shadow: none; }
 .interval:hover, .interval:focus-visible { box-shadow: 0 0 0 2px var(--surface), 0 0 0 3px var(--control-line); }
 .break-band { background: repeating-linear-gradient(135deg, transparent, transparent 3px, var(--line) 3px, var(--line) 4px); }

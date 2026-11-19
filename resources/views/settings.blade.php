@@ -13,7 +13,7 @@
             <span class="settings-section-icon"><x-icon name="settings" /></span>
             <div>
                 <h2 id="station-settings-heading">Station Settings</h2>
-                <p>Set cycle targets and working time for each sensor and station.</p>
+                <p>Set cycle targets and working time for each line and station.</p>
             </div>
         </div>
         <div class="station-settings-body">
@@ -31,7 +31,7 @@
             @endif
                 <form method="GET" action="{{ route('settings') }}" class="station-sensor-form">
                     <div class="station-setting-field">
-                        <label for="settings-sensor">Sensor</label>
+                        <label for="settings-sensor">Line</label>
                         <select name="sensor" id="settings-sensor">
                             @foreach($sensors as $name)
                                 <option value="{{ $name }}" @selected($sensor === $name)>{{ config('production.sensor_labels.'.$name, $name) }}</option>
@@ -39,11 +39,11 @@
                         </select>
                     </div>
                     <button class="button button-quiet" type="submit">View stations</button>
-                    <a class="text-button" href="{{ route('sensors.show', $sensor) }}">Open sensor dashboard <x-icon name="arrow" /></a>
+                    <a class="text-button" href="{{ route('sensors.show', $sensor) }}">Open line dashboard <x-icon name="arrow" /></a>
                 </form>
 
                 @if($stations === [])
-                    <p class="station-settings-note">Worklog data is unavailable for this sensor. Import its worklog to configure stations.</p>
+                    <p class="station-settings-note">Worklog data is unavailable for this line. Import its worklog to configure stations.</p>
                 @else
                     <div class="station-list-heading">
                         <h3 id="station-list-heading">Stations</h3>

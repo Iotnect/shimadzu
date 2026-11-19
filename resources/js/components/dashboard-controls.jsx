@@ -48,7 +48,7 @@ export function mountDashboardControls(data) {
 export function renderSensorOptions(data, selectSensor) {
     mount(document.querySelector('#sensor-options'), <DropdownMenu.Root modal={false}>
         <DropdownMenu.Trigger asChild>
-            <Button type="button" variant="outline" className="cursor-pointer">Sensor Option <ChevronDown aria-hidden="true" /></Button>
+            <Button type="button" variant="outline" className="cursor-pointer">Line Option <ChevronDown aria-hidden="true" /></Button>
         </DropdownMenu.Trigger>
         <DropdownMenu.Portal>
             <DropdownMenu.Content align="end" sideOffset={6} collisionPadding={12}

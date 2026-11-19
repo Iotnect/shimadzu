@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#e31b23">
-    <meta name="description" content="Monitor production cycle times, station activity, and daily performance across sensors.">
+    <meta name="description" content="Monitor production cycle times, station activity, and daily performance across lines.">
     <title>Shimadzu · {{ $title }}</title>
     <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}?v=shimadzu">
     <link rel="icon" type="image/x-icon" sizes="16x16 32x32 48x48" href="{{ asset('favicon.ico') }}?v=shimadzu">

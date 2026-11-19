@@ -46,7 +46,7 @@
                             @elseif($stationPage !== null)
                                 <a class="text-button" href="{{ route('sensors.show', $dashboard['sensor']) }}#stations">View all stations <x-icon name="arrow" /></a>
                             @else
-                                <a class="text-button" id="sensor-worklog-link" href="{{ route('sensors.show', $dashboard['sensor']) }}" data-route="{{ route('sensors.show', ['sensor' => '__sensor__'], absolute: false) }}">Open sensor worklog <x-icon name="arrow" /></a>
+                                <a class="text-button" id="sensor-worklog-link" href="{{ route('sensors.show', $dashboard['sensor']) }}" data-route="{{ route('sensors.show', ['sensor' => '__sensor__'], absolute: false) }}">Open line worklog <x-icon name="arrow" /></a>
                             @endif
                         </div>
                         <div class="table-scroll"><table class="station-table"><thead><tr><th>Station</th><th>Efficiency</th><th>Running</th><th>Idle</th><th>Cycles</th><th></th></tr></thead><tbody id="station-rows"></tbody></table></div>

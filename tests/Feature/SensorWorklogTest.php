@@ -79,7 +79,8 @@ class SensorWorklogTest extends TestCase
         $this->getJson('/dashboard/data?from=2026-05-25')
             ->assertUnprocessable()->assertJsonValidationErrors('to');
         $this->getJson('/dashboard/data?sensor=unknown')
-            ->assertUnprocessable()->assertJsonValidationErrors('sensor');
+            ->assertUnprocessable()->assertJsonValidationErrors('sensor')
+            ->assertJsonPath('errors.sensor.0', 'The selected line is invalid.');
         $this->get('/sensors/unknown')->assertNotFound();
         $this->getJson('/sensors/unknown/data')->assertNotFound();
     }

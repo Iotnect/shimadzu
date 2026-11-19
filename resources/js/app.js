@@ -223,7 +223,7 @@ function showJob(id) {
     if (!job) return;
     const elapsed = duration(job.start, job.end);
     showDialog(`Job #${job.id}`, `<p class="dialog-copy">${escape(job.product ?? 'Product not recorded')}</p>${details([
-        ['Sensor', state.data.sensorLabels?.[state.data.sensor] ?? state.data.sensor], ['Section', job.station], ['SN', job.serial ?? 'Not recorded'], ['WorkDate', dayLabel(job.start.slice(0, 10))],
+        ['Line', state.data.sensorLabels?.[state.data.sensor] ?? state.data.sensor], ['Section', job.station], ['SN', job.serial ?? 'Not recorded'], ['WorkDate', dayLabel(job.start.slice(0, 10))],
         ['Start', `${timeLabel(job.start)}:${job.start.slice(17, 19)}`], ['End', `${dayLabel(job.end.slice(0, 10))} · ${job.end.slice(11, 19)}`],
         ['Cycle duration', elapsed < 0 ? 'End precedes start' : `${number(elapsed, 2)} minutes`], ['Recorded quantity', job.quantity === null ? 'Not recorded in source' : number(job.quantity)],
         ['Operator', job.worker ?? 'Not recorded'], ['Instruction reference', job.reference || 'Not recorded'],
@@ -236,12 +236,12 @@ function showJob(id) {
 
 function showMethod() {
     showDialog('Production metric guide', `<div class="metric-guide">
-        <div><h3>Efficiency % by Station · Working Hour (Min)</h3><p>Total Running / Working Hour × 100. Working Hour sums each selected station's daily working time for the production dates recorded by the sensor. Each date uses the revision effective on that date. The default is 435 minutes per station per day. Overtime can exceed 100%.</p></div>
+        <div><h3>Efficiency % by Station · Working Hour (Min)</h3><p>Total Running / Working Hour × 100. Working Hour sums each selected station's daily working time for the production dates recorded by the line. Each date uses the revision effective on that date. The default is 435 minutes per station per day. Overtime can exceed 100%.</p></div>
         <div><h3>Availability % · Total Running (Min) · Total Idle (Min)</h3><p>Running / (Running + Idle) × 100. Idle covers same-day gaps shorter than 12 hours between jobs at the same station. Time before the first job and after the last job is excluded. Overlapping jobs count once in Total Running.</p></div>
         <div><h3>Performance % · Total Std Time (Min)</h3><p>Total Std Time / Total Running × 100. Each worklog cycle contributes the station standard effective on its start date. A date range can include several revisions. A missing standard for any included cycle leaves total performance unavailable.</p></div>
-        <div><h3>St Std Time (Min)</h3><p>Configure standard cycle time for each sensor and station in Station Settings. A new revision applies from its effective work date. The DET sensor has default cycle times for St1 through St4. A period spanning different standards is labelled as varying over the period.</p></div>
+        <div><h3>St Std Time (Min)</h3><p>Configure standard cycle time for each line and station in Station Settings. A new revision applies from its effective work date. The DET line has default cycle times for St1 through St4. A period spanning different standards is labelled as varying over the period.</p></div>
         <div><h3>Total Qty · Recorded qty (Excel)</h3><p>Total Qty counts worklog records. Recorded qty sums the imported Excel quantities, including genuine zero values. Where an export row shifts qty into an earlier column, the import aligns it with the quantity field. Single-day comparisons use the previous available production day, with rates compared in percentage points (pp).</p></div>
-        <div><h3>Date range · Sensor · Section</h3><p>From and To include both dates and filter by each job's start date. KPIs, distribution, station totals and the work log cover the full selected period. The timeline displays the selected timeline day. Section filtering is available inside each sensor page. Records with an end time before their start remain in the work log and are excluded from running and idle time.</p></div>
+        <div><h3>Date range · Line · Section</h3><p>From and To include both dates and filter by each job's start date. KPIs, distribution, station totals and the work log cover the full selected period. The timeline displays the selected timeline day. Section filtering is available inside each line page. Records with an end time before their start remain in the work log and are excluded from running and idle time.</p></div>
         <div><h3>Scheduled breaks</h3><p>Morning Break 10:15–10:30 · Lunch Break 12:15–13:00 · Tea Break 15:15–15:30. Shading is a visual reference and does not subtract time from recorded intervals.</p></div>
     </div>`, 'HELP & METRIC GUIDE');
 }
@@ -252,7 +252,7 @@ function showSource() {
         ['Workbook', source.name], ['Worksheet', source.worksheet],
         ['Coverage begins', dayLabel(source.from)], ['Coverage ends', dayLabel(source.to)],
         ['Imported job records', number(source.records)], ['Stations', state.data.stations.join(', ')],
-        ['Imported on', dayLabel(source.importedAt.slice(0, 10))], ['Standard time source', source.standardSource ?? 'Not configured for this sensor'],
+        ['Imported on', dayLabel(source.importedAt.slice(0, 10))], ['Standard time source', source.standardSource ?? 'Not configured for this line'],
     ])}<div class="dialog-note">${source.isDemo ? 'Sample data is included with the demo. No database or private file hosting is required.' : `This is historical data, not a live feed. The workbook snapshot ends on ${dayLabel(source.to)}. New workbook changes require a new import. Production dates and times are displayed as recorded in the source.`}</div>`, 'DATA SOURCE & COVERAGE');
 }
 

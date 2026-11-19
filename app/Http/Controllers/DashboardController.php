@@ -50,7 +50,7 @@ class DashboardController extends Controller
             'to' => ['required_with:from', 'date_format:Y-m-d', 'after_or_equal:from'],
             'sensor' => ['sometimes', 'string', Rule::in($dashboard->sensors())],
             'station' => ['sometimes', 'string', Rule::in(['all', 'St1', 'St2', 'St3', 'St4', 'St5', 'St6', 'St7'])],
-        ]);
+        ], [], ['sensor' => 'line']);
     }
 
     public function station(Request $request, ProductionDashboard $dashboard, string $station): View

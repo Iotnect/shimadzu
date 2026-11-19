@@ -17,7 +17,7 @@ class StationSettingsController extends Controller
     public function index(Request $request, ProductionDashboard $dashboard, StationSettings $settings): View
     {
         $sensors = $dashboard->sensors();
-        $input = $request->validate(['sensor' => ['sometimes', 'string', Rule::in($sensors)]]);
+        $input = $request->validate(['sensor' => ['sometimes', 'string', Rule::in($sensors)]], [], ['sensor' => 'line']);
         $sensor = $input['sensor'] ?? (in_array(ProductionDashboard::DEFAULT_SENSOR, $sensors, true) ? ProductionDashboard::DEFAULT_SENSOR : $sensors[0]);
         $available = $settings->available();
         $stations = [];
@@ -51,7 +51,7 @@ class StationSettingsController extends Controller
     public function store(Request $request, ProductionDashboard $dashboard, StationSettings $settings): RedirectResponse
     {
         abort_unless($settings->available() && $request->user() instanceof User, 403);
-        $selection = $request->validate(['sensor' => ['required', 'string', Rule::in($dashboard->sensors())]]);
+        $selection = $request->validate(['sensor' => ['required', 'string', Rule::in($dashboard->sensors())]], [], ['sensor' => 'line']);
         $input = $request->validate([
             'station' => ['required', 'string', Rule::in($dashboard->stationNames($selection['sensor']))],
             'effective_from' => ['required', 'date_format:Y-m-d'],

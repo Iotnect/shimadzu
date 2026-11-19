@@ -14,7 +14,7 @@ use XMLReader;
 use ZipArchive;
 
 #[Signature('worklogs:import {workbook : Path to the XLSX workbook}')]
-#[Description('Import sensor worksheets into private dashboard snapshots')]
+#[Description('Import line worksheets into private dashboard snapshots')]
 class ImportSensorWorklogs extends Command
 {
     public function handle(): int
@@ -84,7 +84,7 @@ class ImportSensorWorklogs extends Command
             }
 
             if ($sensors === []) {
-                $this->error('No sensor worklog worksheets were found.');
+                $this->error('No line worklog worksheets were found.');
 
                 return self::FAILURE;
             }

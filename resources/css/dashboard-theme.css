@@ -158,11 +158,13 @@ h2 { font-size: 17px; font-weight: 600; color: var(--ink); letter-spacing: -.3px
 .station-number { height: 30px; width: 30px; background: var(--surface-subtle); color: var(--muted); border: 1px solid var(--line); border-radius: 6px; box-shadow: none; }
 .station-label-text strong { font-size: 13px; color: var(--ink); }
 .station-label-text small { font-size: 11px; color: var(--muted); }
-.timeline-station { min-height: 44px; width: 100%; padding: 6px; border: 1px solid transparent; background: transparent; text-align: left; color: var(--ink); }
-.timeline-station:hover { background: var(--surface-hover); }
-.timeline-station:active { background: var(--surface-subtle); }
-.timeline-station[aria-pressed="true"] { border-color: var(--ink); background: var(--surface-hover); text-decoration: underline; text-underline-offset: 3px; }
-.timeline-station:focus-visible { outline: 2px solid var(--ink); outline-offset: -2px; }
+.timeline-station { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; width: calc(100% - 10px); padding: 10px 12px; border: 1px solid var(--brand); border-radius: 7px; background: var(--brand); text-align: left; color: #fff; cursor: pointer; }
+.timeline-station strong, .timeline-station small { color: inherit; }
+.timeline-station .icon { width: 15px; height: 15px; }
+.timeline-station:hover { background: var(--brand-hover); border-color: var(--brand-hover); }
+.timeline-station:active { background: var(--brand-hover); box-shadow: inset 0 0 0 1px #fff; }
+.timeline-station[aria-pressed="true"] { background: var(--brand-hover); border-color: var(--ink); text-decoration: underline; text-underline-offset: 3px; box-shadow: inset 0 0 0 1px #fff; }
+.timeline-station:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 .detail-scope { display: block; margin-bottom: 4px; font-size: 11px; font-weight: 600; }
 .interval { top: 21px; height: 25px; border: 1px solid var(--surface); border-radius: 4px; box-shadow: none; }
 .interval:hover, .interval:focus-visible { box-shadow: 0 0 0 2px var(--surface), 0 0 0 3px var(--control-line); }
@@ -187,11 +189,6 @@ td { color: var(--ink); font-size: 13px; border-color: var(--line); padding-top:
 tbody tr:hover { background: var(--surface-subtle); }
 .station-table td { padding-top: 16px; padding-bottom: 16px; }
 .station-name { color: var(--ink); font-size: 13px; }
-.station-select { display: inline-flex; justify-content: center; min-width: 54px; min-height: 44px; padding: 6px 10px; border: 1px solid var(--control-line); border-radius: 4px; background: var(--surface); color: var(--brand-ink); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
-.station-select:hover { background: var(--surface-hover); text-decoration-thickness: 2px; }
-.station-select:active { background: var(--surface-subtle); }
-.station-select[aria-pressed="true"] { border-color: var(--ink); background: var(--surface-hover); font-weight: 700; }
-.station-select:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
 .efficiency-cell span { color: var(--ink); font-size: 13px; width: 48px; }
 .efficiency-track { background: var(--line); height: 5px; width: 70px; box-shadow: none; }
 .efficiency-track i { background: var(--chart-running); }

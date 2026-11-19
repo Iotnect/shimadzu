@@ -59,7 +59,7 @@ function renderTimeline() {
             const end = Math.min(endMinute, minuteOffset(segment.end));
             return `<button class="interval ${segment.status.toLowerCase()}" style="left:${position(minuteOffset(segment.start))}%;width:${Math.max(.12, (end - minuteOffset(segment.start)) / span * 100)}%" title="${label}" aria-label="${label}" data-segment="${index}"></button>`;
         }).join('');
-        return `<div class="timeline-row"><div class="station-label"><button type="button" class="station-label-text timeline-station" data-detail-station="${escape(row.station)}" aria-pressed="${state.detailStation === row.station}" aria-controls="running-count idle-count standard-time total-standard-time"><strong>${escape(row.station)}</strong><small>Total Qty: ${row.cycles}</small></button></div><div class="track" style="background-image:linear-gradient(to right,var(--line) 1px,transparent 1px);background-size:${100 / hourCount}% 100%">${breakBands}${intervals || '<span class="timeline-empty">No recorded activity</span>'}</div></div>`;
+        return `<div class="timeline-row"><div class="station-label"><button type="button" class="station-label-text timeline-station" data-detail-station="${escape(row.station)}" aria-pressed="${state.detailStation === row.station}" aria-controls="running-count idle-count standard-time total-standard-time"><span><strong>${escape(row.station)}</strong><small>Total Qty: ${row.cycles}</small></span>${icon('arrow')}</button></div><div class="track" style="background-image:linear-gradient(to right,var(--line) 1px,transparent 1px);background-size:${100 / hourCount}% 100%">${breakBands}${intervals || '<span class="timeline-empty">No recorded activity</span>'}</div></div>`;
     }).join('')}<div class="break-labels">${breaks.map(([start, end, label]) => `<span class="break-label" style="left:${position((start + end) / 2)}%">${label}</span>`).join('')}</div>`;
 }
 
@@ -72,7 +72,7 @@ function renderDistribution() {
 
 function renderStations() {
     const canSelect = window.detSensorPage && !window.detStationPage;
-    $('#station-rows').innerHTML = state.data.summary.rows.map((row) => `<tr><td><button type="button" class="station-name station-select" data-detail-station="${escape(row.station)}" aria-pressed="${state.detailStation === row.station}" aria-controls="running-count idle-count standard-time total-standard-time">${escape(row.station)}</button></td><td><div class="efficiency-cell"><span>${percent(row.efficiency)}</span><div class="efficiency-track"><i style="width:${Math.min(100, row.efficiency ?? 0)}%"></i></div></div></td><td>${number(row.running)} <small>min</small></td><td>${number(row.idle)} <small>min</small></td><td>${row.cycles}</td><td>${canSelect ? `<button class="icon-button" data-station="${escape(row.station)}" aria-label="Explore ${escape(row.station)}">${icon('arrow')}</button>` : ''}</td></tr>`).join('');
+    $('#station-rows').innerHTML = state.data.summary.rows.map((row) => `<tr><td><span class="station-name">${escape(row.station)}</span></td><td><div class="efficiency-cell"><span>${percent(row.efficiency)}</span><div class="efficiency-track"><i style="width:${Math.min(100, row.efficiency ?? 0)}%"></i></div></div></td><td>${number(row.running)} <small>min</small></td><td>${number(row.idle)} <small>min</small></td><td>${row.cycles}</td><td>${canSelect ? `<button class="icon-button" data-station="${escape(row.station)}" aria-label="Explore ${escape(row.station)}">${icon('arrow')}</button>` : ''}</td></tr>`).join('');
 }
 
 function renderStationDetails() {

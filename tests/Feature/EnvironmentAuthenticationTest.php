@@ -69,6 +69,37 @@ class EnvironmentAuthenticationTest extends TestCase
         $this->withUnencryptedCookies($cookies)->get('/setting')->assertOk()->assertSee('Appearance');
     }
 
+    public function test_station_settings_can_be_previewed_without_a_database(): void
+    {
+        config(['production.demo_mode' => true, 'production.worklog_path' => storage_path('testing/missing-demo-source.json')]);
+        $this->post('/login', ['email' => 'admin@example.com', 'password' => 'private-admin-password']);
+
+        $this->get('/setting?sensor=lc2kdet&station=St2')
+            ->assertOk()
+            ->assertViewHas('settingsAvailable', false)
+            ->assertViewHas('station', 'St2')
+            ->assertSee('data-preview="true"', false)
+            ->assertSee('value="37.24"', false)
+            ->assertSee('value="435"', false)
+            ->assertSee('Preview changes')
+            ->assertSee('Revision history is not saved in this demo preview.')
+            ->assertDontSee('Station parameters require a database-backed account');
+    }
+
+    public function test_preview_accounts_cannot_save_station_changes_or_affect_dashboard_values(): void
+    {
+        config(['production.demo_mode' => true, 'production.worklog_path' => storage_path('testing/missing-demo-source.json')]);
+        $this->post('/login', ['email' => 'admin@example.com', 'password' => 'private-admin-password']);
+
+        $this->post('/setting/stations', [
+            'sensor' => 'lc2kdet', 'station' => 'St1', 'effective_from' => '2026-05-26',
+            'standard_minutes' => 99, 'working_minutes' => 999, 'notes' => 'Demo changes.',
+        ])->assertForbidden();
+
+        $this->getJson('/dashboard/data?date=2026-05-26&station=St1')
+            ->assertOk()->assertJsonPath('summary.rows.0.standard', 25.515)->assertJsonPath('summary.available', 435);
+    }
+
     public function test_a_configured_username_can_sign_in_to_the_same_account(): void
     {
         config(['auth.providers.users.username' => 'operator']);

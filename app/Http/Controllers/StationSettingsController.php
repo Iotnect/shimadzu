@@ -21,13 +21,11 @@ class StationSettingsController extends Controller
         $sensor = $input['sensor'] ?? (in_array(ProductionDashboard::DEFAULT_SENSOR, $sensors, true) ? ProductionDashboard::DEFAULT_SENSOR : $sensors[0]);
         $available = $settings->available();
         $stations = [];
-        if ($available) {
-            try {
-                $stations = $dashboard->stationNames($sensor);
-            } catch (HttpException $exception) {
-                if ($exception->getStatusCode() !== 503) {
-                    throw $exception;
-                }
+        try {
+            $stations = $dashboard->stationNames($sensor);
+        } catch (HttpException $exception) {
+            if ($exception->getStatusCode() !== 503) {
+                throw $exception;
             }
         }
         $selection = $request->validate(['station' => ['sometimes', 'string', Rule::in($stations)]]);

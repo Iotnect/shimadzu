@@ -27,8 +27,8 @@
                 </div>
             @endif
             @if(!$settingsAvailable)
-                <p class="station-settings-note">Station parameters require a database-backed account and the station settings migration.</p>
-            @else
+                <p class="station-settings-note">Demo preview. Changes here are not saved or applied to the dashboard.</p>
+            @endif
                 <form method="GET" action="{{ route('settings') }}" class="station-sensor-form">
                     <div class="station-setting-field">
                         <label for="settings-sensor">Sensor</label>
@@ -73,11 +73,11 @@
                         <div class="station-editor-heading">
                             <div>
                                 <h3 id="station-editor-heading">Edit station parameters</h3>
-                                <p>Dashboard metrics use the values effective on each work date.</p>
+                                <p>{{ $settingsAvailable ? 'Dashboard metrics use the values effective on each work date.' : 'Try editing the station parameters in this demo preview.' }}</p>
                             </div>
                             <span class="station-editor-scope">{{ config('production.sensor_labels.'.$sensor, $sensor) }} / {{ $station }}</span>
                         </div>
-                        <form method="POST" action="{{ route('settings.stations.store') }}" id="station-parameters-form">
+                        <form method="POST" action="{{ route('settings.stations.store') }}" id="station-parameters-form" data-preview="{{ $settingsAvailable ? 'false' : 'true' }}">
                             @csrf
                             <input type="hidden" name="sensor" value="{{ $sensor }}">
                             <input type="hidden" name="station" value="{{ $station }}">
@@ -97,9 +97,13 @@
                                 </div>
                             </div>
                             <div class="station-setting-save">
-                                <p class="station-settings-note">Past effective dates recalculate historical metrics for this station. If revisions share a date, the latest saved revision applies.</p>
-                                <button type="submit" class="button button-primary">Save changes</button>
+                                <p class="station-settings-note">{{ $settingsAvailable ? 'Past effective dates recalculate historical metrics for this station. If revisions share a date, the latest saved revision applies.' : 'Preview changes to try the form. The dashboard will continue using its current parameters.' }}</p>
+                                <button type="submit" class="button button-primary">{{ $settingsAvailable ? 'Save changes' : 'Preview changes' }}</button>
                             </div>
+                            @if(!$settingsAvailable)
+                                <p id="station-preview-status" class="station-settings-status" role="status" hidden></p>
+                                <noscript>Enable JavaScript to preview station parameters.</noscript>
+                            @endif
                         </form>
                     </section>
 
@@ -108,7 +112,9 @@
                             <h3 id="station-history-heading">Change history</h3>
                             <span>{{ config('production.sensor_labels.'.$sensor, $sensor) }} / {{ $station }}</span>
                         </div>
-                        @if($history->isEmpty())
+                        @if($history === null)
+                            <p class="station-history-empty"><x-icon name="clock" /> Revision history is not saved in this demo preview.</p>
+                        @elseif($history->isEmpty())
                             <p class="station-history-empty"><x-icon name="clock" /> No revisions saved. The default parameters are in use.</p>
                         @else
                             <div class="table-scroll station-table-frame" role="region" aria-labelledby="station-history-heading" tabindex="0">
@@ -135,7 +141,6 @@
                         @endif
                     </section>
                 @endif
-            @endif
         </div>
     </section>
 

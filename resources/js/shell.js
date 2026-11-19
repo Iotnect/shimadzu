@@ -4,6 +4,13 @@ import { mountAppearanceSettings } from './components/appearance-settings';
 
 mountAppearanceSettings();
 document.querySelector('#station-parameters-form')?.addEventListener('submit', event => {
+    if (event.target.dataset.preview === 'true') {
+        event.preventDefault();
+        const status = document.querySelector('#station-preview-status');
+        status.textContent = 'Preview complete. Your changes have not been saved or applied to the dashboard.';
+        status.hidden = false;
+        return;
+    }
     const button = event.target.querySelector('button[type="submit"]');
     button.disabled = true;
     button.textContent = 'Saving…';

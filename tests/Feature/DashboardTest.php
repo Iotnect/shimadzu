@@ -41,7 +41,7 @@ class DashboardTest extends TestCase
             ->assertViewIs('dashboard')
             ->assertViewHas('stationPage', 'St1')
             ->assertSee('DET cycle timeline · St1')
-            ->assertSee('Open metric guide')
+            ->assertDontSee('Open metric guide')
             ->assertSee('View all stations');
 
         $this->assertSame('St1', $response['dashboard']['station']);

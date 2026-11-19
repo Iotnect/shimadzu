@@ -1,4 +1,4 @@
-<x-app-layout title="Production dashboard" :show-metric-guide="false">
+<x-app-layout title="Production dashboard">
     <div class="page-heading"><h1>Production dashboard</h1></div>
 
     <section class="panel" aria-labelledby="worklog-unavailable">

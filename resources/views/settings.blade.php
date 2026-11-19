@@ -39,7 +39,6 @@
                         </select>
                     </div>
                     <button class="button button-quiet" type="submit">View stations</button>
-                    <a class="text-button" href="{{ route('sensors.show', $sensor) }}">Open line dashboard <x-icon name="arrow" /></a>
                 </form>
 
                 @if($stations === [])

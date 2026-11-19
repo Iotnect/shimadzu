@@ -138,15 +138,11 @@ function render() {
     if ($('#station-filter')) $('#station-filter').value = state.data.station;
     $('#data-period').textContent = `Coverage ${dayLabel(state.data.source.from)} – ${dayLabel(state.data.source.to)}`;
     $('#sensor-label').textContent = state.data.sensorLabels?.[state.data.sensor] ?? state.data.sensor;
-    const worklogLink = $('#sensor-worklog-link');
-    if (worklogLink) {
+    if (!window.detSensorPage && !window.detStationPage) {
         const title = `${state.data.sensorLabels?.[state.data.sensor] ?? state.data.sensor} cycle timeline`;
         $('#overview h1').textContent = title;
         $('.breadcrumb strong').textContent = title;
         document.title = `Shimadzu · ${title}`;
-        const url = new URL(worklogLink.dataset.route.replace('__sensor__', state.data.sensor), location.href);
-        url.search = new URLSearchParams({ from: state.data.from, to: state.data.to, date: state.data.date }).toString();
-        worklogLink.href = url.href;
     }
     $('#timeline-day-control').hidden = state.data.from === state.data.to;
     const timelineDates = state.data.periodDates.length ? state.data.periodDates : [state.data.date];
@@ -234,18 +230,6 @@ function showJob(id) {
     ])}<div class="dialog-note">A logged cycle is a job record. Recorded quantity is the Excel qty value; a zero quantity is preserved as zero.</div>`, 'PRODUCTION WORK LOG');
 }
 
-function showMethod() {
-    showDialog('Production metric guide', `<div class="metric-guide">
-        <div><h3>Efficiency % by Station · Working Hour (Min)</h3><p>Total Running / Working Hour × 100. Working Hour sums each selected station's daily working time for the production dates recorded by the line. Each date uses the revision effective on that date. The default is 435 minutes per station per day. Overtime can exceed 100%.</p></div>
-        <div><h3>Availability % · Total Running (Min) · Total Idle (Min)</h3><p>Running / (Running + Idle) × 100. Idle covers same-day gaps shorter than 12 hours between jobs at the same station. Time before the first job and after the last job is excluded. Overlapping jobs count once in Total Running.</p></div>
-        <div><h3>Performance % · Total Std Time (Min)</h3><p>Total Std Time / Total Running × 100. Each worklog cycle contributes the station standard effective on its start date. A date range can include several revisions. A missing standard for any included cycle leaves total performance unavailable.</p></div>
-        <div><h3>St Std Time (Min)</h3><p>Configure standard cycle time for each line and station in Station Settings. A new revision applies from its effective work date. The DET line has default cycle times for St1 through St4. A period spanning different standards is labelled as varying over the period.</p></div>
-        <div><h3>Total Qty · Recorded qty (Excel)</h3><p>Total Qty counts worklog records. Recorded qty sums the imported Excel quantities, including genuine zero values. Where an export row shifts qty into an earlier column, the import aligns it with the quantity field. Single-day comparisons use the previous available production day, with rates compared in percentage points (pp).</p></div>
-        <div><h3>Date range · Line · Section</h3><p>From and To include both dates and filter by each job's start date. KPIs, distribution, station totals and the work log cover the full selected period. The timeline displays the selected timeline day. Section filtering is available inside each line page. Records with an end time before their start remain in the work log and are excluded from running and idle time.</p></div>
-        <div><h3>Scheduled breaks</h3><p>Morning Break 10:15–10:30 · Lunch Break 12:15–13:00 · Tea Break 15:15–15:30. Shading is a visual reference and does not subtract time from recorded intervals.</p></div>
-    </div>`, 'HELP & METRIC GUIDE');
-}
-
 function showSource() {
     const { source } = state.data;
     showDialog('Your production data', `<p class="dialog-copy">${source.isDemo ? 'This demo uses built-in synthetic records to demonstrate the dashboard. They are not actual production records.' : 'This workspace uses an imported Excel snapshot. The original workbook and PBIX have not been modified.'}</p>${details([
@@ -307,8 +291,8 @@ document.addEventListener('click', (event) => {
         renderStationDetails();
         $('#load-status').textContent = `Counts and standard times updated for ${state.detailStation ?? 'all displayed stations'}`;
     }
-    const dialogButton = event.target.closest('[data-dialog]');
-    if (dialogButton) dialogButton.dataset.dialog === 'source' ? showSource() : showMethod();
+    const sourceButton = event.target.closest('[data-dialog="source"]');
+    if (sourceButton) showSource();
     const jobButton = event.target.closest('[data-job]');
     if (jobButton) showJob(jobButton.dataset.job);
     const intervalButton = event.target.closest('[data-segment]');

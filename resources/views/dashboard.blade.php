@@ -29,7 +29,7 @@
                     <div class="panel-heading"><h2 class="sr-only">Station · Working Time</h2><span class="sr-only" id="station-count"></span><label class="timeline-day" id="timeline-day-control" hidden>Timeline day <select id="timeline-date" aria-label="Timeline day"></select></label><div class="legend"><strong>Status</strong><span><i class="dot running"></i>Running</span><span><i class="dot idle"></i>Idle</span></div></div>
                     <div class="timeline-stats" id="timeline-stats"></div>
                     <div class="timeline-scroll"><div class="timeline-chart" id="timeline-chart" aria-label="Daily running and idle intervals by station"></div></div>
-                    <div class="timeline-footer"><span><x-icon name="help" />Select an interval to explore cycle details.</span><button class="text-button" data-dialog="method">How is this calculated? <span>↗</span></button></div>
+                    <div class="timeline-footer"><span><x-icon name="help" />Select an interval to explore cycle details.</span></div>
                 </section>
 
                 <div class="analysis-grid">
@@ -45,12 +45,10 @@
                                 <button class="text-button" id="compare-stations">Compare all <x-icon name="arrow" /></button>
                             @elseif($stationPage !== null)
                                 <a class="text-button" href="{{ route('sensors.show', $dashboard['sensor']) }}#stations">View all stations <x-icon name="arrow" /></a>
-                            @else
-                                <a class="text-button" id="sensor-worklog-link" href="{{ route('sensors.show', $dashboard['sensor']) }}" data-route="{{ route('sensors.show', ['sensor' => '__sensor__'], absolute: false) }}">Open line worklog <x-icon name="arrow" /></a>
                             @endif
                         </div>
                         <div class="table-scroll"><table class="station-table"><thead><tr><th>Station</th><th>Efficiency</th><th>Running</th><th>Idle</th><th>Cycles</th><th></th></tr></thead><tbody id="station-rows"></tbody></table></div>
-                        <div class="station-foot"><i class="dot running"></i>Efficiency = running time / available station time <button class="text-button" data-dialog="method">View metrics <span>↗</span></button></div>
+                        <div class="station-foot"><i class="dot running"></i>Efficiency = running time / available station time</div>
                     </section>
                 </div>
                 </div>
